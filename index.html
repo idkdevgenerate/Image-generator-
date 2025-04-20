@@ -59,6 +59,7 @@
             color: white;
             text-decoration: none;
             border-bottom: 1px solid #444;
+            cursor: pointer;
         }
         .menu a:hover {
             background: #333;
@@ -73,118 +74,53 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .message {
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background: #4285f4;
-            text-decoration: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            border: none;
-        }
-        .generated-image {
-            display: none;
-            margin-top: 20px;
-            max-width: 100%;
-            border-radius: 8px;
-        }
-        .note {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-        }
         .chat-container {
             width: 100%;
-            height: 400px;
+            height: 600px;
             border: none;
             margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <a class="back-btn" href="#">← Back</a>
+        <a class="back-btn" href="#" onclick="hideChat()">← Back</a>
         <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
     </div>
 
     <div class="menu" id="menu">
         <a href="#" onclick="toggleMenu()">Close Menu ✖</a>
+        <a href="#" onclick="embedAI('aether')">AetherAI-Chi</a>
+        <a href="#" onclick="embedAI('gemini')">Gemini Image Generator</a>
         <a href="#">Go Back</a>
         <a href="exit.html">Exit</a>
     </div>
 
     <div class="container">
-        <div class="header">AI Image Generator</div>
-        <div class="message">Choose an image category:</div>
-        
-        <select id="imageCategory">
-            <option value="anime">Anime Images</option>
-            <option value="roblox">Roblox-Style Images</option>
-            <option value="cute_girl">Real Cute Girl Images (For RBX)</option>
-            <option value="cat">Cat Images</option>
-        </select>
-
-        <button class="btn" onclick="generateImage()">Generate Image</button>
-        <div class="loading" id="loadingMessage">Processing...</div>
-        <img id="generatedImage" class="generated-image" src="" alt="Generated Image">
-        
-        <div class="note">
-            **Note:** This is a **fake image generator** designed for demonstration purposes only.  
-            Embedded AI Chat powered by  
-            <a href="https://aetherai-chi.vercel.app" target="_blank">AetherAI-Chi</a>.
+        <div id="chatFrame">
+            <iframe class="chat-container" id="aiEmbed" src="" frameborder="0"></iframe>
         </div>
-
-        <!-- Embedded Gemini AI Image Generation Test Page -->
-        <iframe class="chat-container" src="https://gemini.google/overview/image-generation/" width="100%" height="500px" frameborder="0"></iframe>
-
-        <!-- AI Chat Frame -->
-        <iframe class="chat-container" src="https://aetherai-chi.vercel.app"></iframe>
     </div>
 
     <script>
-        function generateImage() {
-            document.getElementById("loadingMessage").style.display = "block";
-
-            setTimeout(() => {
-                let category = document.getElementById("imageCategory").value;
-                let images = {
-                    "anime": [
-                        "https://tse1.mm.bing.net/th?id=OIG1.AZ.sfq0W0D8NrFHSbyMe&pid=ImgGn",
-                        "https://tse2.mm.bing.net/th/id/OIG2.3oi.jQIvTGfx86fIejxV?pid=ImgGn"
-                    ],
-                    "roblox": [
-                        "/attachments/a5muZFsn568er47Ur6X4T.jpeg"
-                    ],
-                    "cute_girl": [
-                        "/attachments/J48nYWjD8Vf73g4ncAgxm.jpeg"
-                    ],
-                    "cat": [
-                        "/attachments/WLuf1HKmKAGi61oE8HPGC.jpeg",
-                        "/attachments/yprCDH2EwQeaeqg4J4AED.jpeg",
-                        "/attachments/G1YgeMQyvwPz2bu4b97HQ.jpeg"
-                    ]
-                };
-
-                let selectedImages = images[category];
-                let randomImage = selectedImages[Math.floor(Math.random() * selectedImages.length)];
-
-                document.getElementById("generatedImage").src = randomImage;
-                document.getElementById("generatedImage").style.display = "block";
-                document.getElementById("loadingMessage").style.display = "none";
-            }, 2000);
-        }
-
         function toggleMenu() {
             let menu = document.getElementById("menu");
             menu.style.right = menu.style.right === "0px" ? "-250px" : "0px";
+        }
+
+        function embedAI(type) {
+            let iframe = document.getElementById("aiEmbed");
+            iframe.style.display = "block";
+            if (type === "aether") {
+                iframe.src = "https://aetherai-chi.vercel.app";
+            } else if (type === "gemini") {
+                iframe.src = "https://gemini.google/overview/image-generation/";
+            }
+        }
+
+        function hideChat() {
+            document.getElementById("aiEmbed").style.display = "none";
         }
     </script>
 </body>
