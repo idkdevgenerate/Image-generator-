@@ -1,85 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Anime Image Generator</title>
-    <style>
-        body {
-            text-align: center;
-            background-color: #f0f0f0;
-        }
-        canvas {
-            border: 2px solid #000;
-        }
-        .btn {
-            padding: 10px;
-            font-size: 16px;
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <title>AI Image Generator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <h2>AI-Powered Anime Image Generator</h2>
-    <canvas id="animeCanvas" width="500" height="500"></canvas>
-    <button class="btn" onclick="generateAnimeImage()">Generate Image</button>
-
-    <script>
-        function generateAnimeImage() {
-            const canvas = document.getElementById("animeCanvas");
-            const ctx = canvas.getContext("2d");
-
-            // Clear previous drawing
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Background gradient for anime glow
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, "#ffcccb");
-            gradient.addColorStop(1, "#ff66b2");
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Anime character face
-            ctx.fillStyle = "#fddac2"; // Skin tone
-            ctx.beginPath();
-            ctx.arc(250, 250, 120, 0, Math.PI * 2); // Head
-            ctx.fill();
-
-            // Eyes - Anime style (big, reflective)
-            ctx.fillStyle = "#000";
-            ctx.beginPath();
-            ctx.arc(210, 230, 30, 0, Math.PI * 2); // Left eye
-            ctx.arc(290, 230, 30, 0, Math.PI * 2); // Right eye
-            ctx.fill();
-
-            // Eye highlights (white reflection)
-            ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.arc(220, 220, 10, 0, Math.PI * 2);
-            ctx.arc(300, 220, 10, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Hair (styled spikes)
-            ctx.fillStyle = "#502f73";
-            ctx.beginPath();
-            ctx.moveTo(150, 160);
-            ctx.lineTo(350, 160);
-            ctx.lineTo(300, 100);
-            ctx.lineTo(200, 100);
-            ctx.fill();
-
-            // Mouth - Anime expression
-            ctx.fillStyle = "#c0392b";
-            ctx.beginPath();
-            ctx.arc(250, 300, 15, 0, Math.PI);
-            ctx.fill();
-        }
-    </script>
-
+    <h1>Generate an Image</h1>
+    <input type="text" id="prompt" placeholder="Enter prompt">
+    <button onclick="generateImage()">Generate</button>
+    <br><br>
+    <img id="output" width="400px">
+    <script src="script.js"></script>
 </body>
 </html>
