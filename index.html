@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image & Chat</title>
+    <title>AI Assistant & Image Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <style>
         body, html {
             margin: 0;
@@ -26,14 +27,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-        .back-btn {
-            color: white;
-            background: #555;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
         }
         .menu-btn {
             color: white;
@@ -74,6 +67,12 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        .hidden-url {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            padding: 10px;
+        }
         .chat-container {
             width: 100%;
             height: 600px;
@@ -85,7 +84,6 @@
 </head>
 <body>
     <div class="navbar">
-        <a class="back-btn" href="#" onclick="hideChat()">← Back</a>
         <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
     </div>
 
@@ -93,7 +91,7 @@
         <a href="#" onclick="toggleMenu()">Close Menu ✖</a>
         <a href="#" onclick="embedAI('aether')">AetherAI-Chi</a>
         <a href="#" onclick="embedAI('gemini')">Gemini Image Generator</a>
-        <a href="#">Go Back</a>
+        <a href="#" onclick="openChat()">AI Chat Assistant</a>
         <a href="exit.html">Exit</a>
     </div>
 
@@ -101,9 +99,24 @@
         <div id="chatFrame">
             <iframe class="chat-container" id="aiEmbed" src="" frameborder="0"></iframe>
         </div>
+        
+        <h2>AI Assistant Access</h2>
+        <p>Enter your password to unlock the AI Assistant:</p>
+        <input type="password" id="passwordInput" placeholder="Enter password">
+        <button onclick="verifyPassword()">Unlock</button>
+        <p class="hidden-url" id="hiddenUrl">API Key: *****</p>
+    </div>
+
+    <div class="chat-container" id="chatBox" style="display:none;">
+        <h2>AI Chat Assistant</h2>
+        <input type="text" id="userInput" placeholder="Ask AI something...">
+        <button onclick="sendMessage()">Send</button>
+        <p id="aiResponse"></p>
     </div>
 
     <script>
+        const storedPassword = "your-secure-password"; // Set securely
+
         function toggleMenu() {
             let menu = document.getElementById("menu");
             menu.style.right = menu.style.right === "0px" ? "-250px" : "0px";
@@ -119,8 +132,36 @@
             }
         }
 
-        function hideChat() {
-            document.getElementById("aiEmbed").style.display = "none";
+        function verifyPassword() {
+            let userPassword = document.getElementById("passwordInput").value;
+            if (userPassword === storedPassword) {
+                document.getElementById("hiddenUrl").innerText = "API Key: https://your-ai-assistant-url.com";
+                document.getElementById("aiEmbed").src = "https://your-ai-assistant-url.com";
+                document.getElementById("aiEmbed").style.display = "block";
+            } else {
+                alert("Incorrect password! Try again.");
+            }
+        }
+
+        function openChat() {
+            document.getElementById("chatBox").style.display = "block";
+        }
+
+        function sendMessage() {
+            let userMessage = document.getElementById("userInput").value;
+            if (!userMessage.trim()) return;
+
+            let aiResponse = generateAIResponse(userMessage);
+            document.getElementById("aiResponse").innerText = aiResponse;
+        }
+
+        function generateAIResponse(userMessage) {
+            let responses = {
+                "hello": "Hi! How can I assist you today?",
+                "how are you": "I'm an AI, but I’m here to help!",
+                "tell me a joke": "Why do AI never get tired? They always have backup power!"
+            };
+            return responses[userMessage.toLowerCase()] || "I'm processing... Try asking something else!";
         }
     </script>
 </body>
