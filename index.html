@@ -3,166 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant & Image Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <title>Anime Image Generator</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
+        body {
             text-align: center;
             background-color: #f8f9fa;
-            height: 100vh;
-            overflow: hidden;
         }
-        .navbar {
-            background: #333;
-            color: white;
+        canvas {
+            border: 2px solid black;
+        }
+        .btn {
             padding: 10px;
-            text-align: left;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .menu-btn {
-            color: white;
+            font-size: 16px;
             background: #007bff;
-            padding: 5px 10px;
+            color: white;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
-        }
-        .menu {
-            position: fixed;
-            top: 0;
-            right: -250px;
-            width: 250px;
-            height: 100%;
-            background: #222;
-            color: white;
-            padding-top: 50px;
-            transition: 0.3s;
-        }
-        .menu a {
-            display: block;
-            padding: 15px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid #444;
-            cursor: pointer;
-        }
-        .menu a:hover {
-            background: #333;
-        }
-        .container {
-            margin-top: 60px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .hidden-url {
-            font-size: 18px;
-            font-weight: bold;
-            color: #555;
-            padding: 10px;
-        }
-        .chat-container {
-            width: 100%;
-            height: 600px;
-            border: none;
-            margin-top: 20px;
-            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
-    </div>
 
-    <div class="menu" id="menu">
-        <a href="#" onclick="toggleMenu()">Close Menu ✖</a>
-        <a href="#" onclick="embedAI('aether')">AetherAI-Chi</a>
-        <a href="#" onclick="embedAI('gemini')">Gemini Image Generator</a>
-        <a href="#" onclick="openChat()">AI Chat Assistant</a>
-        <a href="exit.html">Exit</a>
-    </div>
-
-    <div class="container">
-        <div id="chatFrame">
-            <iframe class="chat-container" id="aiEmbed" src="" frameborder="0"></iframe>
-        </div>
-        
-        <h2>AI Assistant Access</h2>
-        <p>Enter your password to unlock the AI Assistant:</p>
-        <input type="password" id="passwordInput" placeholder="Enter password">
-        <button onclick="verifyPassword()">Unlock</button>
-        <p class="hidden-url" id="hiddenUrl">API Key: *****</p>
-    </div>
-
-    <div class="chat-container" id="chatBox" style="display:none;">
-        <h2>AI Chat Assistant</h2>
-        <input type="text" id="userInput" placeholder="Ask AI something...">
-        <button onclick="sendMessage()">Send</button>
-        <p id="aiResponse"></p>
-    </div>
+    <h2>AI-Powered Anime Image Generator</h2>
+    <canvas id="animeCanvas" width="400" height="400"></canvas>
+    <button class="btn" onclick="generateAnimeImage()">Generate Image</button>
 
     <script>
-        const storedPassword = "your-secure-password"; // Set securely
+        function generateAnimeImage() {
+            const canvas = document.getElementById("animeCanvas");
+            const ctx = canvas.getContext("2d");
 
-        function toggleMenu() {
-            let menu = document.getElementById("menu");
-            menu.style.right = menu.style.right === "0px" ? "-250px" : "0px";
-        }
+            // Clear previous drawing
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        function embedAI(type) {
-            let iframe = document.getElementById("aiEmbed");
-            iframe.style.display = "block";
-            if (type === "aether") {
-                iframe.src = "https://aetherai-chi.vercel.app";
-            } else if (type === "gemini") {
-                iframe.src = "https://gemini.google/overview/image-generation/";
-            }
-        }
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#ffcccb");
+            gradient.addColorStop(1, "#ff66b2");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function verifyPassword() {
-            let userPassword = document.getElementById("passwordInput").value;
-            if (userPassword === storedPassword) {
-                document.getElementById("hiddenUrl").innerText = "API Key: https://your-ai-assistant-url.com";
-                document.getElementById("aiEmbed").src = "https://your-ai-assistant-url.com";
-                document.getElementById("aiEmbed").style.display = "block";
-            } else {
-                alert("Incorrect password! Try again.");
-            }
-        }
+            // Generate anime face shape
+            ctx.fillStyle = "#fddac2"; // Skin tone
+            ctx.beginPath();
+            ctx.arc(200, 200, 120, 0, Math.PI * 2); // Head
+            ctx.fill();
 
-        function openChat() {
-            document.getElementById("chatBox").style.display = "block";
-        }
+            // Eyes
+            ctx.fillStyle = "#000";
+            ctx.beginPath();
+            ctx.arc(160, 180, 20, 0, Math.PI * 2); // Left eye
+            ctx.arc(240, 180, 20, 0, Math.PI * 2); // Right eye
+            ctx.fill();
 
-        function sendMessage() {
-            let userMessage = document.getElementById("userInput").value;
-            if (!userMessage.trim()) return;
+            // Hair
+            ctx.fillStyle = "#502f73";
+            ctx.beginPath();
+            ctx.moveTo(80, 150);
+            ctx.lineTo(320, 150);
+            ctx.lineTo(250, 100);
+            ctx.lineTo(150, 100);
+            ctx.fill();
 
-            let aiResponse = generateAIResponse(userMessage);
-            document.getElementById("aiResponse").innerText = aiResponse;
-        }
-
-        function generateAIResponse(userMessage) {
-            let responses = {
-                "hello": "Hi! How can I assist you today?",
-                "how are you": "I'm an AI, but I’m here to help!",
-                "tell me a joke": "Why do AI never get tired? They always have backup power!"
-            };
-            return responses[userMessage.toLowerCase()] || "I'm processing... Try asking something else!";
+            // Mouth
+            ctx.fillStyle = "#c0392b";
+            ctx.beginPath();
+            ctx.arc(200, 240, 15, 0, Math.PI);
+            ctx.fill();
         }
     </script>
+
 </body>
 </html>
