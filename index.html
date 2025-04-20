@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake AI Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+        .message {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #4285f4;
+            font-weight: bold;
+        }
+        .anime-options {
+            text-align: left;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background: #4285f4;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+        }
+        .btn:hover {
+            background: #357ae8;
+        }
+        .generated-image {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">AI Image Generator</div>
+        <div class="message">Select an image style:</div>
+        
+        <div class="anime-options">
+            <strong>Suggested Styles:</strong>
+            <ul>
+                <li>Cyberpunk Anime Artwork</li>
+                <li>Fantasy Landscape with Anime Characters</li>
+                <li>Mecha Battle Scene</li>
+                <li>Traditional Japanese Anime Sketch</li>
+                <li>Schoolgirl Anime Art</li>
+                <li>Slice-of-Life Anime Classroom Scene</li>
+                <li>Magical Girl Transformation Scene</li>
+            </ul>
+        </div>
+
+        <button class="btn" onclick="generateImage()">Generate Image</button>
+        <div class="loading" id="loadingMessage">Processing...</div>
+        <img id="generatedImage" class="generated-image" src="" alt="Generated Anime Image">
+        
+        <div class="note">
+            **Note:** This is a **fake image generation system** designed for demonstration purposes only.  
+            If you're looking for a real AI-powered image generator, check out  
+            <a href="https://aetherai.vercel.app" target="_blank">AetherAI</a>, which uses ChatGPT technology.
+        </div>
+    </div>
+
+    <script>
+        function generateImage() {
+            document.getElementById("loadingMessage").style.display = "block";
+
+            setTimeout(() => {
+                let images = [
+                    "https://tse1.mm.bing.net/th?id=OIG1.AZ.sfq0W0D8NrFHSbyMe&pid=ImgGn",
+                    "https://tse2.mm.bing.net/th/id/OIG2.3oi.jQIvTGfx86fIejxV?pid=ImgGn",
+                    "https://tse3.mm.bing.net/th?id=OIG1.3_mK9twnzhuOX96tnO8p&pid=ImgGn"
+                ];
+
+                let randomImage = images[Math.floor(Math.random() * images.length)];
+                document.getElementById("generatedImage").src = randomImage;
+                document.getElementById("generatedImage").style.display = "block";
+                document.getElementById("loadingMessage").style.display = "none";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
