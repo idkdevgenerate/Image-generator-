@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>AI Image Generator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Generate an Image</h1>
-    <input type="text" id="prompt" placeholder="Enter prompt">
-    <button onclick="generateImage()">Generate</button>
-    <br><br>
-    <img id="output" width="400px">
+    <div class="container">
+        <h1>AI Image Generator</h1>
+        <p>Enter a prompt to generate an AI-powered image.</p>
+        <input type="text" id="prompt" placeholder="Type your prompt here..." />
+        <button onclick="generateImage()">Generate</button>
+        <div class="image-container">
+            <img id="output" alt="Generated Image" />
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
