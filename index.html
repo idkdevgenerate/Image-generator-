@@ -3,43 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake AI Image Generator</title>
+    <title>AI Image & Chat</title>
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f8f9fa;
-            padding: 50px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .navbar {
+            background: #333;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .back-btn {
+            color: white;
+            background: #555;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .menu-btn {
+            color: white;
+            background: #007bff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .menu {
+            position: fixed;
+            top: 0;
+            right: -250px;
+            width: 250px;
+            height: 100%;
+            background: #222;
+            color: white;
+            padding-top: 50px;
+            transition: 0.3s;
+        }
+        .menu a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .menu a:hover {
+            background: #333;
         }
         .container {
+            margin-top: 60px;
             max-width: 600px;
-            margin: auto;
+            margin-left: auto;
+            margin-right: auto;
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .header {
-            font-size: 24px;
-            color: #333;
-            font-weight: bold;
-        }
         .message {
             font-size: 16px;
             color: #666;
             margin-top: 10px;
-        }
-        .loading {
-            display: none;
-            margin-top: 20px;
-            font-size: 18px;
-            color: #4285f4;
-            font-weight: bold;
-        }
-        .anime-options {
-            text-align: left;
-            margin-top: 20px;
-            font-size: 16px;
         }
         .btn {
             display: inline-block;
@@ -53,50 +90,63 @@
             margin-top: 10px;
             border: none;
         }
-        .btn:hover {
-            background: #357ae8;
-        }
         .generated-image {
             display: none;
             margin-top: 20px;
             max-width: 100%;
             border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
         .note {
             margin-top: 20px;
             font-size: 14px;
             color: #888;
         }
+        .chat-container {
+            width: 100%;
+            height: 400px;
+            border: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <a class="back-btn" href="#">← Back</a>
+        <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+    </div>
+
+    <div class="menu" id="menu">
+        <a href="#" onclick="toggleMenu()">Close Menu ✖</a>
+        <a href="#">Go Back</a>
+        <a href="exit.html">Exit</a>
+    </div>
+
     <div class="container">
         <div class="header">AI Image Generator</div>
-        <div class="message">Select an image style:</div>
+        <div class="message">Choose an image category:</div>
         
-        <div class="anime-options">
-            <strong>Suggested Styles:</strong>
-            <ul>
-                <li>Cyberpunk Anime Artwork</li>
-                <li>Fantasy Landscape with Anime Characters</li>
-                <li>Mecha Battle Scene</li>
-                <li>Traditional Japanese Anime Sketch</li>
-                <li>Schoolgirl Anime Art</li>
-                <li>Slice-of-Life Anime Classroom Scene</li>
-                <li>Magical Girl Transformation Scene</li>
-            </ul>
-        </div>
+        <select id="imageCategory">
+            <option value="anime">Anime Images</option>
+            <option value="roblox">Roblox-Style Images</option>
+            <option value="cute_girl">Real Cute Girl Images (For RBX)</option>
+            <option value="cat">Cat Images</option>
+        </select>
 
         <button class="btn" onclick="generateImage()">Generate Image</button>
         <div class="loading" id="loadingMessage">Processing...</div>
-        <img id="generatedImage" class="generated-image" src="" alt="Generated Anime Image">
+        <img id="generatedImage" class="generated-image" src="" alt="Generated Image">
         
         <div class="note">
-            **Note:** This is a **fake image generation system** designed for demonstration purposes only.  
-            If you're looking for a real AI-powered image generator, check out  
-            <a href="https://aetherai.vercel.app" target="_blank">AetherAI</a>, which uses ChatGPT technology.
+            **Note:** This is a **fake image generator** designed for demonstration purposes only.  
+            Embedded AI Chat powered by  
+            <a href="https://aetherai-chi.vercel.app" target="_blank">AetherAI-Chi</a>.
         </div>
+
+        <!-- Embedded Gemini AI Image Generation Test Page -->
+        <iframe class="chat-container" src="https://gemini.google/overview/image-generation/" width="100%" height="500px" frameborder="0"></iframe>
+
+        <!-- AI Chat Frame -->
+        <iframe class="chat-container" src="https://aetherai-chi.vercel.app"></iframe>
     </div>
 
     <script>
@@ -104,17 +154,37 @@
             document.getElementById("loadingMessage").style.display = "block";
 
             setTimeout(() => {
-                let images = [
-                    "https://tse1.mm.bing.net/th?id=OIG1.AZ.sfq0W0D8NrFHSbyMe&pid=ImgGn",
-                    "https://tse2.mm.bing.net/th/id/OIG2.3oi.jQIvTGfx86fIejxV?pid=ImgGn",
-                    "https://tse3.mm.bing.net/th?id=OIG1.3_mK9twnzhuOX96tnO8p&pid=ImgGn"
-                ];
+                let category = document.getElementById("imageCategory").value;
+                let images = {
+                    "anime": [
+                        "https://tse1.mm.bing.net/th?id=OIG1.AZ.sfq0W0D8NrFHSbyMe&pid=ImgGn",
+                        "https://tse2.mm.bing.net/th/id/OIG2.3oi.jQIvTGfx86fIejxV?pid=ImgGn"
+                    ],
+                    "roblox": [
+                        "/attachments/a5muZFsn568er47Ur6X4T.jpeg"
+                    ],
+                    "cute_girl": [
+                        "/attachments/J48nYWjD8Vf73g4ncAgxm.jpeg"
+                    ],
+                    "cat": [
+                        "/attachments/WLuf1HKmKAGi61oE8HPGC.jpeg",
+                        "/attachments/yprCDH2EwQeaeqg4J4AED.jpeg",
+                        "/attachments/G1YgeMQyvwPz2bu4b97HQ.jpeg"
+                    ]
+                };
 
-                let randomImage = images[Math.floor(Math.random() * images.length)];
+                let selectedImages = images[category];
+                let randomImage = selectedImages[Math.floor(Math.random() * selectedImages.length)];
+
                 document.getElementById("generatedImage").src = randomImage;
                 document.getElementById("generatedImage").style.display = "block";
                 document.getElementById("loadingMessage").style.display = "none";
             }, 2000);
+        }
+
+        function toggleMenu() {
+            let menu = document.getElementById("menu");
+            menu.style.right = menu.style.right === "0px" ? "-250px" : "0px";
         }
     </script>
 </body>
