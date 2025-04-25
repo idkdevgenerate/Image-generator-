@@ -1,72 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ChatGPT Rainbow</title>
-  <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Arial', sans-serif;
-      background-color: #101010;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Ban</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .rainbow-border {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      box-shadow: 0 0 30px 10px red;
-      animation: rainbow-glow 5s linear infinite;
-      z-index: 10;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f3f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #202124;
+        }
 
-    @keyframes rainbow-glow {
-      0% { box-shadow: 0 0 30px 10px red; }
-      16% { box-shadow: 0 0 30px 10px orange; }
-      33% { box-shadow: 0 0 30px 10px yellow; }
-      50% { box-shadow: 0 0 30px 10px green; }
-      66% { box-shadow: 0 0 30px 10px blue; }
-      83% { box-shadow: 0 0 30px 10px indigo; }
-      100% { box-shadow: 0 0 30px 10px violet; }
-    }
+        .ban-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
 
-    .chat-window {
-      z-index: 5;
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 40px;
-      width: 400px;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
+        h1 {
+            font-size: 24px;
+            color: #ea4335;
+        }
 
-    .chat-input {
-      margin-top: 20px;
-      padding: 10px;
-      width: 100%;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-      background: #333;
-      color: white;
-    }
-  </style>
+        p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .action-button {
+            background-color: #ea4335;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .action-button:hover {
+            background-color: #c1351d;
+        }
+    </style>
 </head>
 <body>
-  <div class="rainbow-border"></div>
-  <div class="chat-window">
-    <h1>ChatGPT</h1>
-    <p>Hello! How can I assist you today?</p>
-    <input class="chat-input" placeholder="Type your message..." />
-  </div>
+
+<div class="ban-container" id="ban-container">
+    <h1>Your device has been deactivated</h1>
+    <p>We're sorry, but your device or account has been banned from this platform.</p>
+    <p class="error-message" id="error-message"></p>
+    <button class="action-button" id="contact-support-button">Contact Support</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs"></script>
+<script>
+    // List of banned device IDs (You can hardcode these or simulate an API request)
+    const bannedDevices = ["device-id-1", "device-id-2"];
+    const bannedIps = ["192.168.1.100", "203.0.113.5"]; // Simulating banned IPs for the browser
+
+    // Simulate a function to get the IP (you would normally fetch this from a server)
+    function getUserIp() {
+        // This is just a simulation since we can't actually get the real IP in this context
+        return "192.168.1.100"; // Example IP address
+    }
+
+    // Simulate checking IP ban
+    function checkIpBan(ip) {
+        return bannedIps.includes(ip);
+    }
+
+    // Initialize FingerprintJS
+    FingerprintJS.load().then(fp => {
+        // Get the unique device identifier
+        fp.get().then(result => {
+            const deviceId = result.visitorId; // Unique ID for the device
+
+            // Check if the device is banned
+            if (bannedDevices.includes(deviceId)) {
+                showBanPage("Device banned");
+            }
+
+            // Check if the IP is banned
+            const ip = getUserIp();
+            if (checkIpBan(ip)) {
+                showBanPage("IP banned");
+            }
+        });
+    });
+
+    // Function to show the ban page
+    function showBanPage(reason) {
+        document.getElementById('ban-container').style.display = 'block';
+        document.getElementById('error-message').textContent = `Reason: ${reason}. You cannot access this platform.`;
+        document.getElementById('contact-support-button').addEventListener('click', function() {
+            window.location.href = "mailto:support@example.com"; // Email support for appeal
+        });
+    }
+
+    // Initial hiding of the ban page in case the user is not banned
+    document.getElementById('ban-container').style.display = 'none';
+</script>
+
 </body>
 </html>
