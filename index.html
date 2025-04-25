@@ -1,227 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot with Ban Screen</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>ChatGPT Siri Style</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f1f3f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #202124;
-        }
+    .chatgpt-button {
+      background: rgba(30, 30, 30, 0.9);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 24px;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 255, 128, 0.4);
+      backdrop-filter: blur(10px);
+    }
 
-        .ban-container, .chat-container {
-            display: none;
-            text-align: center;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-        }
+    .chatgpt-logo {
+      width: 24px;
+      height: 24px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg') no-repeat center/contain;
+      filter: invert(1);
+    }
 
-        h1 {
-            font-size: 24px;
-            color: #ea4335;
-        }
+    .rainbow-ring {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      position: absolute;
+      top: calc(50% - 100px);
+      left: calc(50% - 100px);
+      background: conic-gradient(
+        red, orange, yellow, green, cyan, blue, violet, red
+      );
+      animation: spin 4s linear infinite;
+      filter: blur(15px);
+      z-index: -1;
+    }
 
-        p {
-            font-size: 16px;
-            color: #333;
-        }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        .error-message {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #666;
-        }
-
-        .action-button {
-            background-color: #ea4335;
-            color: #fff;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .action-button:hover {
-            background-color: #c1351d;
-        }
-
-        /* Chatbox styles */
-        .chat-container {
-            display: block;
-            width: 100%;
-            max-width: 400px;
-            margin: auto;
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .messages {
-            height: 300px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .messages p {
-            margin: 10px 0;
-            padding: 8px;
-            border-radius: 10px;
-            background-color: #f1f1f1;
-        }
-
-        .messages .user {
-            background-color: #dcf8c6;
-            text-align: right;
-        }
-
-        .messages .bot {
-            background-color: #f1f1f1;
-            text-align: left;
-        }
-
-        input[type="text"] {
-            padding: 12px;
-            width: 80%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
-
-        button {
-            padding: 12px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    .loading-spinner {
+      margin-top: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #00ffcc;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Ban Page -->
-<div class="ban-container" id="ban-container">
-    <h1>Your device has been deactivated</h1>
-    <p>We're sorry, but your device or account has been banned from this platform.</p>
-    <p class="error-message" id="error-message"></p>
-    <button class="action-button" id="contact-support-button">Contact Support</button>
-</div>
+  <div class="rainbow-ring"></div>
 
-<!-- Chatbot Interface -->
-<div class="chat-container" id="chat-container">
-    <h2>Chat with AI</h2>
-    <div class="messages" id="messages"></div>
-    <input type="text" id="user-input" placeholder="Ask me anything..." />
-    <button onclick="sendMessage()">Send</button>
-</div>
+  <button class="chatgpt-button" onclick="askChatGPT()">
+    <div class="chatgpt-logo"></div>
+    Ask ChatGPT
+  </button>
 
-<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs"></script>
-<script>
-    // List of banned device IDs (hardcoded or simulated API request)
-    const bannedDevices = ["device-id-1", "device-id-2"];
-    const bannedIps = ["192.168.1.100", "203.0.113.5"]; // Simulating banned IPs
+  <div id="loading" class="loading-spinner"></div>
 
-    // Simulate a function to get the IP (normally fetched from a server)
-    function getUserIp() {
-        return "192.168.1.100"; // Example IP address
+  <script>
+    function askChatGPT() {
+      const spinner = document.getElementById('loading');
+      spinner.style.display = 'block';
+
+      // Simulate loading for 3 seconds (replace with actual API call)
+      setTimeout(() => {
+        spinner.style.display = 'none';
+        alert("Here's a ChatGPT response!");
+      }, 3000);
     }
-
-    // Simulate checking IP ban
-    function checkIpBan(ip) {
-        return bannedIps.includes(ip);
-    }
-
-    // Function to initialize FingerprintJS and check for banned device
-    FingerprintJS.load().then(fp => {
-        fp.get().then(result => {
-            const deviceId = result.visitorId; // Unique ID for the device
-
-            // Check if the device or IP is banned
-            const ip = getUserIp();
-            if (bannedDevices.includes(deviceId) || checkIpBan(ip)) {
-                showBanPage("Your device or IP has been banned");
-            } else {
-                showChat();
-            }
-        });
-    });
-
-    // Show the ban screen
-    function showBanPage(reason) {
-        document.getElementById('ban-container').style.display = 'block';
-        document.getElementById('error-message').textContent = `Reason: ${reason}. You cannot access this platform.`;
-        document.getElementById('contact-support-button').addEventListener('click', function() {
-            window.location.href = "mailto:support@example.com"; // Email support for appeal
-        });
-    }
-
-    // Show chat interface
-    function showChat() {
-        document.getElementById('chat-container').style.display = 'block';
-    }
-
-    // Simple AI response function (simulating an AI chatbot)
-    function sendMessage() {
-        const userInput = document.getElementById("user-input").value.trim();
-        if (userInput === "") return;
-
-        // Display user message
-        const userMessage = document.createElement("p");
-        userMessage.className = "user";
-        userMessage.textContent = userInput;
-        document.getElementById("messages").appendChild(userMessage);
-
-        // Display bot response (AI logic can be more advanced here)
-        const botMessage = document.createElement("p");
-        botMessage.className = "bot";
-        botMessage.textContent = getBotResponse(userInput);
-        document.getElementById("messages").appendChild(botMessage);
-
-        // Scroll to the bottom
-        document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
-
-        // Clear input field
-        document.getElementById("user-input").value = "";
-    }
-
-    // Simple response logic for the bot (could be replaced with actual AI)
-    function getBotResponse(input) {
-        if (input.toLowerCase().includes("hello")) {
-            return "Hello! How can I help you today?";
-        } else if (input.toLowerCase().includes("ban")) {
-            return "If you're banned, please contact support.";
-        } else {
-            return "Sorry, I didn't understand that.";
-        }
-    }
-
-    // Hide both screens initially
-    document.getElementById('ban-container').style.display = 'none';
-    document.getElementById('chat-container').style.display = 'none';
-</script>
+  </script>
 
 </body>
 </html>
