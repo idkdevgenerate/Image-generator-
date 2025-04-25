@@ -1,99 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Maker</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #workspace { width: 60%; height: 400px; border: 2px solid black; float: left; }
-        #controls { width: 35%; float: right; }
-        .draggable { width: 100px; cursor: grab; }
-        #payment-modal, #denied-modal {
-            position: fixed;
-            bottom: -100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            background: white;
-            padding: 20px;
-            box-shadow: 0px -5px 10px rgba(0, 0, 0, 0.2);
-            transition: bottom 0.4s ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>ChatGPT Rainbow</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background-color: #101010;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .rainbow-border {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      box-shadow: 0 0 30px 10px red;
+      animation: rainbow-glow 5s linear infinite;
+      z-index: 10;
+    }
+
+    @keyframes rainbow-glow {
+      0% { box-shadow: 0 0 30px 10px red; }
+      16% { box-shadow: 0 0 30px 10px orange; }
+      33% { box-shadow: 0 0 30px 10px yellow; }
+      50% { box-shadow: 0 0 30px 10px green; }
+      66% { box-shadow: 0 0 30px 10px blue; }
+      83% { box-shadow: 0 0 30px 10px indigo; }
+      100% { box-shadow: 0 0 30px 10px violet; }
+    }
+
+    .chat-window {
+      z-index: 5;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 40px;
+      width: 400px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-input {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background: #333;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-    <div id="workspace" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <p>Drag elements here</p>
-    </div>
-    <div id="controls">
-        <button onclick="searchGoogle()">Search Google Images</button>
-        <button onclick="searchRoblox()">Search Roblox Images</button>
-        <button onclick="addText()">Add Text</button>
-        <button onclick="addAvatar()">Add Avatar</button>
-        <button onclick="newPage()">New Page</button>
-        <button onclick="copyPage()">Copy Page</button>
-        <button onclick="showPaymentModal()">Buy Movie Features</button>
-    </div>
-
-    <div id="payment-modal">
-        <p>Are you sure you want to buy <strong>Speech Pack</strong> for <strong>100 Currency</strong>?</p>
-        <button onclick="processPayment()">Submit</button>
-        <button onclick="closePaymentModal()">Cancel</button>
-    </div>
-
-    <div id="denied-modal">
-        <p>Access Denied! You’re either not eligible or on a guest account.</p>
-        <button onclick="closeDeniedModal()">OK</button>
-    </div>
-
-    <script>
-        let userCurrency = 100;
-        let accounts = {
-            "RobloxUser123": { password: "securePass123", role: "owner", paymentMethodSet: true },
-            "GuestUser456": { password: "guestPass789", role: "guest", paymentMethodSet: false }
-        };
-
-        function allowDrop(event) { event.preventDefault(); }
-        function drop(event) { event.preventDefault(); let data = event.dataTransfer.getData("text"); event.target.appendChild(document.getElementById(data)); }
-
-        function searchGoogle() { alert("Google Custom Search API will be used here."); }
-        function searchRoblox() { alert("Roblox Image API will be used here."); }
-
-        function addText() {
-            let textBox = document.createElement("div");
-            textBox.contentEditable = true;
-            textBox.style.border = "1px solid black";
-            textBox.style.padding = "5px";
-            textBox.innerText = "Click to edit text";
-            document.getElementById("workspace").appendChild(textBox);
-        }
-
-        function addAvatar() { alert("Fetching and displaying Roblox avatar..."); }
-        function newPage() { alert("Creating a new blank page..."); }
-        function copyPage() { alert("Copying existing page..."); }
-
-        function showPaymentModal() { document.getElementById("payment-modal").style.bottom = "10%"; }
-        function closePaymentModal() { document.getElementById("payment-modal").style.bottom = "-100%"; }
-        function closeDeniedModal() { document.getElementById("denied-modal").style.bottom = "-100%"; }
-
-        function processPayment() {
-            let paymentMethod = prompt("Choose payment method: Stripe or In-App Currency");
-            let cost = 100;
-            if (paymentMethod === "Stripe") { window.location.href = "https://stripe.com/checkout"; }
-            else if (paymentMethod === "In-App Currency" && userCurrency >= cost) {
-                userCurrency -= cost;
-                alert("Purchased successfully with in-game currency!");
-                closePaymentModal();
-            } else { alert("Insufficient balance!"); }
-        }
-
-        function checkPaymentEligibility(username) {
-            let account = accounts[username];
-            if (!account || account.role !== "owner") { document.getElementById("denied-modal").style.bottom = "10%"; return false; }
-            if (!account.paymentMethodSet) { alert("Setup required: Please add a payment method."); return false; }
-            return true;
-        }
-    </script>
+  <div class="rainbow-border"></div>
+  <div class="chat-window">
+    <h1>ChatGPT</h1>
+    <p>Hello! How can I assist you today?</p>
+    <input class="chat-input" placeholder="Type your message..." />
+  </div>
 </body>
 </html>
