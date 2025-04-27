@@ -3,165 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#121212">
-    <title>AI Chatbot</title>
-
-    <!-- Manifest for PWA -->
-    <link rel="manifest" href="#">
-
+    <title>Roblox Username Finder</title>
     <style>
-        /* Basic Reset */
-        * {
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: #f7f7f7;
         }
-
-        /* Dark theme */
-        body {
-            background-color: #121212;
-            font-family: Arial, sans-serif;
-            color: white;
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-
-        /* Chat container and chat box */
-        #chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            justify-content: flex-end;
+        input[type="text"] {
+            width: 100%;
             padding: 10px;
-        }
-
-        #chat-box {
-            overflow-y: scroll;
-            max-height: 80%;
             margin-bottom: 10px;
-            padding: 10px;
-            background-color: #333;
-            border-radius: 10px;
-            flex-grow: 1;
-        }
-
-        #input-container {
-            display: flex;
-            padding: 10px;
-            background-color: #444;
-            border-radius: 10px;
-        }
-
-        #user-input {
-            width: 80%;
-            padding: 10px;
-            border: none;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #555;
-            color: white;
-            margin-right: 10px;
         }
-
         button {
+            width: 100%;
             padding: 10px;
+            background-color: #00b0ff;
+            color: white;
             border: none;
             border-radius: 5px;
-            background-color: #0084ff;
-            color: white;
-            cursor: pointer;
+            font-size: 16px;
         }
-
-        button:hover {
-            background-color: #0073e6;
+        #result {
+            margin-top: 20px;
         }
-
-        /* Chat bubbles */
-        .user-msg {
-            background-color: #4CAF50;
-            color: white;
+        .user-card {
             padding: 10px;
-            border-radius: 15px;
-            margin: 5px 0;
-            max-width: 80%;
-            align-self: flex-end;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        .ai-msg {
-            background-color: #0084ff;
-            color: white;
-            padding: 10px;
-            border-radius: 15px;
-            margin: 5px 0;
-            max-width: 80%;
-            align-self: flex-start;
+        .user-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
         }
-
+        .user-card a {
+            color: #00b0ff;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 
-    <div id="chat-container">
-        <div id="chat-box">
-            <!-- AI chat messages will appear here -->
-        </div>
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="Type a message..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+<div class="container">
+    <h1>Roblox Username Finder</h1>
+    <input type="text" id="usernameInput" placeholder="Enter Roblox username" />
+    <button id="searchButton">Search</button>
+    <div id="result"></div>
+</div>
 
-    <script>
-        // Simulated AI responses (can be modified)
-        const responses = {
-            "hello": "Hi there! How can I help you today?",
-            "how are you": "I'm just a bot, but I'm doing well, thank you!",
-            "bye": "Goodbye! Have a great day!",
-            "default": "I'm not sure how to respond to that. Can you ask something else?"
-        };
-
-        // Function to append messages to the chat
-        function appendMessage(message, sender) {
-            const chatBox = document.getElementById("chat-box");
-            const messageElem = document.createElement("div");
-
-            messageElem.classList.add(sender === 'user' ? 'user-msg' : 'ai-msg');
-            messageElem.textContent = message;
-            chatBox.appendChild(messageElem);
-
-            // Scroll to the bottom of the chat box
-            chatBox.scrollTop = chatBox.scrollHeight;
+<script>
+    document.getElementById('searchButton').addEventListener('click', async function() {
+        const username = document.getElementById('usernameInput').value.trim();
+        if (username === "") {
+            alert("Please enter a username");
+            return;
         }
 
-        // Function to handle sending messages
-        function sendMessage() {
-            const userInput = document.getElementById("user-input");
-            const userMessage = userInput.value.trim();
-
-            if (userMessage) {
-                // Display the user's message
-                appendMessage(userMessage, 'user');
-
-                // Generate AI response (based on the message)
-                const aiResponse = responses[userMessage.toLowerCase()] || responses['default'];
-                appendMessage(aiResponse, 'ai');
-            }
-
-            // Clear the input field after sending
-            userInput.value = "";
+        // Fetching user data based on username
+        const userUrl = `https://api.roblox.com/users/get-by-username?username=${username}`;
+        const response = await fetch(userUrl);
+        
+        if (!response.ok) {
+            document.getElementById('result').innerHTML = "<p>User not found or invalid username.</p>";
+            return;
         }
 
-        // Customize AI responses by modifying the responses object
-        // Example: responses["hello"] = "Hello, how can I assist you today?";
-    </script>
+        const userData = await response.json();
+        const userId = userData.Id;
 
-    <!-- PWA Manifest (if added to home screen) -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                console.log('Service Worker registered with scope:', registration.scope);
-            }).catch(function(error) {
-                console.log('Service Worker registration failed:', error);
-            });
-        }
-    </script>
+        // Fetching user avatar image
+        const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
+
+        // Fetching user status (Online or Offline)
+        const statusUrl = `https://users.roblox.com/v1/users/${userId}/status`;
+        const statusResponse = await fetch(statusUrl);
+        const statusData = await statusResponse.json();
+        const status = statusData.isOnline ? "Online" : "Offline";
+
+        // Displaying user info in a card
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <div class="user-card">
+                <div>
+                    <h3>${userData.Username}</h3>
+                    <p>Status: ${status}</p>
+                </div>
+                <img src="${avatarUrl}" alt="Avatar">
+                <a href="https://www.roblox.com/users/${userId}/profile" target="_blank">Go to Profile</a>
+            </div>
+        `;
+    });
+</script>
 
 </body>
 </html>
