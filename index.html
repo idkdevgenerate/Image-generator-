@@ -3,162 +3,147 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111">
-  <title>Geometry Dash Game</title>
-
-  <!-- Manifest Inline -->
-  <script type="application/json" id="manifest">
-    {
-      "short_name": "Geometry Dash",
-      "name": "Geometry Dash-like Game",
-      "icons": [
-        {
-          "src": "icon.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ],
-      "start_url": "/index.html",
-      "background_color": "#111",
-      "theme_color": "#111",
-      "display": "standalone",
-      "orientation": "portrait"
-    }
-  </script>
-  
+  <title>Project Editor</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      background-color: #111;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
-    canvas {
-      display: block;
-    }
-    #fullscreenButton {
+    #toolbar {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #333;
-      color: #fff;
-      padding: 10px 20px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      padding: 10px;
+      border-radius: 10px;
+      z-index: 10;
+    }
+    #toolbar button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
+    }
+    .draggable {
+      width: 100px;
+      height: 50px;
+      background-color: #3498db;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      margin: 10px;
+      cursor: move;
+      position: absolute;
+    }
+    .canvas {
+      width: 100%;
+      height: calc(100vh - 60px);
+      background-color: #f4f4f4;
+      position: relative;
+    }
+    .input-box {
+      width: 200px;
+      height: 30px;
+      margin: 10px;
+      padding: 5px;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      position: absolute;
     }
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas"></canvas>
-  <button id="fullscreenButton">Go Full Screen</button>
 
-  <!-- Service Worker Registration Script -->
+  <h1>Project Editor</h1>
+
+  <!-- Canvas to add elements -->
+  <div class="canvas" id="canvas"></div>
+
+  <!-- Toolbar with buttons to add elements -->
+  <div id="toolbar">
+    <button onclick="addButton()">Add Button</button>
+    <button onclick="addTextBox()">Add Text Box</button>
+    <button onclick="exitEditor()">Exit</button>
+  </div>
+
+  <!-- Custom Code Area -->
+  <div style="padding: 20px; background-color: #efefef; width: 100%; text-align: center;">
+    <h3>Add Custom Code</h3>
+    <textarea id="customCode" rows="5" cols="40" placeholder="Write your custom HTML/CSS/JS code here..."></textarea>
+    <br>
+    <button onclick="addCustomCode()">Add Custom Code</button>
+  </div>
+
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-        console.log('Service Worker registered with scope:', registration.scope);
-      }).catch(function(error) {
-        console.log('Service Worker registration failed:', error);
-      });
+    let draggedElement = null;
+
+    // Add Button to the canvas
+    function addButton() {
+      const button = document.createElement('div');
+      button.classList.add('draggable');
+      button.textContent = 'Button';
+      button.style.left = '50px';
+      button.style.top = '50px';
+      button.setAttribute('draggable', true);
+      button.addEventListener('dragstart', dragStart);
+      document.getElementById('canvas').appendChild(button);
+    }
+
+    // Add Text Box to the canvas
+    function addTextBox() {
+      const textBox = document.createElement('input');
+      textBox.classList.add('input-box');
+      textBox.placeholder = 'Type something...';
+      textBox.style.left = '150px';
+      textBox.style.top = '150px';
+      document.getElementById('canvas').appendChild(textBox);
+    }
+
+    // Add Custom Code to the canvas
+    function addCustomCode() {
+      const code = document.getElementById('customCode').value;
+      const customElement = document.createElement('div');
+      customElement.innerHTML = code; // Assuming user enters valid HTML code
+      customElement.style.position = 'absolute';
+      customElement.style.left = '250px';
+      customElement.style.top = '250px';
+      document.getElementById('canvas').appendChild(customElement);
+    }
+
+    // Handle Drag Start
+    function dragStart(e) {
+      draggedElement = e.target;
+      const rect = draggedElement.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+
+      document.onmousemove = function (e) {
+        draggedElement.style.left = `${e.clientX - offsetX}px`;
+        draggedElement.style.top = `${e.clientY - offsetY}px`;
+      };
+
+      document.onmouseup = function () {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    }
+
+    // Exit Editor
+    function exitEditor() {
+      window.location.href = '/'; // or any exit logic
     }
   </script>
 
-  <!-- Inline Game Script -->
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const fullscreenButton = document.getElementById('fullscreenButton');
-
-    // Set initial canvas size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    // Load levels from JSON (inline)
-    const levelData = {
-      "levels": [
-        {
-          "id": 1,
-          "name": "Spike Gauntlet",
-          "description": "A series of narrow platforms with spikes scattered all around. Time your jumps precisely to avoid the spikes.",
-          "music": "spike-gauntlet.mp3",
-          "platforms": [
-            { "x": 0, "y": canvas.height - 50, "width": 500, "height": 50 },
-            { "x": 600, "y": canvas.height - 150, "width": 200, "height": 20 },
-            { "x": 900, "y": canvas.height - 250, "width": 200, "height": 20 }
-          ],
-          "spikes": [
-            { "x": 600, "y": canvas.height - 100, "width": 50, "height": 50 },
-            { "x": 900, "y": canvas.height - 180, "width": 50, "height": 50 },
-            { "x": 1200, "y": canvas.height - 280, "width": 50, "height": 50 }
-          ],
-          "background": "#111",
-          "levelColor": "#FF5733"
-        },
-        {
-          "id": 2,
-          "name": "Bouncing Madness",
-          "description": "A level filled with wall bouncing and tricky obstacles. You must bounce off walls to survive.",
-          "music": "bouncing-madness.mp3",
-          "platforms": [
-            { "x": 0, "y": canvas.height - 50, "width": 500, "height": 50 },
-            { "x": 400, "y": canvas.height - 150, "width": 200, "height": 20 }
-          ],
-          "spikes": [
-            { "x": 600, "y": canvas.height - 100, "width": 50, "height": 50 },
-            { "x": 1000, "y": canvas.height - 200, "width": 50, "height": 50 }
-          ],
-          "bouncingWalls": [
-            { "x": 700, "y": 300, "width": 50, "height": 100, "speed": 2 },
-            { "x": 1100, "y": 200, "width": 50, "height": 100, "speed": -2 }
-          ],
-          "background": "#222",
-          "levelColor": "#33FF57"
-        }
-      ]
-    };
-
-    // Function to load a level dynamically
-    function loadLevel(levelId) {
-      const level = levelData.levels.find(level => level.id === levelId);
-      if (!level) return;
-
-      // Set the background color
-      document.body.style.backgroundColor = level.background;
-
-      // Draw platforms
-      ctx.fillStyle = level.levelColor;
-      level.platforms.forEach(platform => {
-        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-      });
-
-      // Draw spikes
-      ctx.fillStyle = "red";
-      level.spikes.forEach(spike => {
-        ctx.fillRect(spike.x, spike.y, spike.width, spike.height);
-      });
-
-      // Draw bouncing walls
-      ctx.fillStyle = "blue";
-      level.bouncingWalls.forEach(wall => {
-        ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
-      });
-    }
-
-    // Full-screen mode
-    fullscreenButton.addEventListener("click", function() {
-      if (canvas.requestFullscreen) {
-        canvas.requestFullscreen();
-      } else if (canvas.mozRequestFullScreen) { // Firefox
-        canvas.mozRequestFullScreen();
-      } else if (canvas.webkitRequestFullscreen) { // Chrome and Safari
-        canvas.webkitRequestFullscreen();
-      } else if (canvas.msRequestFullscreen) { // IE/Edge
-        canvas.msRequestFullscreen();
-      }
-    });
-
-    // Load level 1 as default
-    loadLevel(1);
-  </script>
 </body>
 </html>
