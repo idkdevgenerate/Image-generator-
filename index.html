@@ -1,206 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Editor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      background-color: #f4f4f4;
-    }
-    #toolbar {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #333;
-      padding: 10px;
-      border-radius: 10px;
-      z-index: 10;
-    }
-    #toolbar button {
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .draggable {
-      width: 100px;
-      height: 50px;
-      background-color: #3498db;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 5px;
-      margin: 10px;
-      cursor: move;
-      position: absolute;
-    }
-    .canvas {
-      width: 100%;
-      height: calc(100vh - 60px);
-      background-color: #f4f4f4;
-      position: relative;
-    }
-    .input-box {
-      width: 200px;
-      height: 30px;
-      margin: 10px;
-      padding: 5px;
-      border: 2px solid #3498db;
-      border-radius: 5px;
-      position: absolute;
-    }
-    /* Rainbow Border Effect */
-    .rainbow-border {
-      border-radius: 10px;
-      padding: 15px;
-      position: fixed;
-      left: 10%;
-      bottom: 10%;
-      width: 80%;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      font-size: 18px;
-      display: none;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#121212">
+    <title>AI Chatbot</title>
 
-    /* For the rainbow animation */
-    @keyframes rainbow {
-      0% { border-color: red; }
-      14% { border-color: orange; }
-      28% { border-color: yellow; }
-      42% { border-color: green; }
-      57% { border-color: blue; }
-      71% { border-color: indigo; }
-      85% { border-color: violet; }
-      100% { border-color: red; }
-    }
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="#">
 
-    .rainbow-border.active {
-      animation: rainbow 1.5s linear infinite;
-    }
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Blurred Background */
-    .blurred {
-      backdrop-filter: blur(10px);
-    }
-  </style>
+        /* Dark theme */
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        /* Chat container and chat box */
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+
+        #chat-box {
+            overflow-y: scroll;
+            max-height: 80%;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 10px;
+            flex-grow: 1;
+        }
+
+        #input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 10px;
+        }
+
+        #user-input {
+            width: 80%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #555;
+            color: white;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0084ff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0073e6;
+        }
+
+        /* Chat bubbles */
+        .user-msg {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 15px;
+            margin: 5px 0;
+            max-width: 80%;
+            align-self: flex-end;
+        }
+
+        .ai-msg {
+            background-color: #0084ff;
+            color: white;
+            padding: 10px;
+            border-radius: 15px;
+            margin: 5px 0;
+            max-width: 80%;
+            align-self: flex-start;
+        }
+
+    </style>
 </head>
 <body>
 
-  <h1>Project Editor</h1>
+    <div id="chat-container">
+        <div id="chat-box">
+            <!-- AI chat messages will appear here -->
+        </div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
-  <!-- Canvas to add elements -->
-  <div class="canvas" id="canvas"></div>
+    <script>
+        // Simulated AI responses (can be modified)
+        const responses = {
+            "hello": "Hi there! How can I help you today?",
+            "how are you": "I'm just a bot, but I'm doing well, thank you!",
+            "bye": "Goodbye! Have a great day!",
+            "default": "I'm not sure how to respond to that. Can you ask something else?"
+        };
 
-  <!-- Toolbar with buttons to add elements -->
-  <div id="toolbar">
-    <button onclick="addButton()">Add Button</button>
-    <button onclick="addTextBox()">Add Text Box</button>
-    <button onclick="exitEditor()">Exit</button>
-  </div>
+        // Function to append messages to the chat
+        function appendMessage(message, sender) {
+            const chatBox = document.getElementById("chat-box");
+            const messageElem = document.createElement("div");
 
-  <!-- Custom Code Area -->
-  <div style="padding: 20px; background-color: #efefef; width: 100%; text-align: center;">
-    <h3>Add Custom Code</h3>
-    <textarea id="customCode" rows="5" cols="40" placeholder="Write your custom HTML/CSS/JS code here..."></textarea>
-    <br>
-    <button onclick="addCustomCode()">Add Custom Code</button>
-  </div>
+            messageElem.classList.add(sender === 'user' ? 'user-msg' : 'ai-msg');
+            messageElem.textContent = message;
+            chatBox.appendChild(messageElem);
 
-  <!-- Rainbow Border for Enhancement -->
-  <div id="rainbowEffect" class="rainbow-border blurred">
-    <input type="text" id="enhanceInput" placeholder="Enhance your project..." />
-    <button onclick="enhanceProject()">Enhance</button>
-  </div>
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-  <script>
-    let draggedElement = null;
+        // Function to handle sending messages
+        function sendMessage() {
+            const userInput = document.getElementById("user-input");
+            const userMessage = userInput.value.trim();
 
-    // Add Button to the canvas
-    function addButton() {
-      const button = document.createElement('div');
-      button.classList.add('draggable');
-      button.textContent = 'Button';
-      button.style.left = '50px';
-      button.style.top = '50px';
-      button.setAttribute('draggable', true);
-      button.addEventListener('dragstart', dragStart);
-      document.getElementById('canvas').appendChild(button);
-    }
+            if (userMessage) {
+                // Display the user's message
+                appendMessage(userMessage, 'user');
 
-    // Add Text Box to the canvas
-    function addTextBox() {
-      const textBox = document.createElement('input');
-      textBox.classList.add('input-box');
-      textBox.placeholder = 'Type something...';
-      textBox.style.left = '150px';
-      textBox.style.top = '150px';
-      document.getElementById('canvas').appendChild(textBox);
-    }
+                // Generate AI response (based on the message)
+                const aiResponse = responses[userMessage.toLowerCase()] || responses['default'];
+                appendMessage(aiResponse, 'ai');
+            }
 
-    // Add Custom Code to the canvas
-    function addCustomCode() {
-      const code = document.getElementById('customCode').value;
-      const customElement = document.createElement('div');
-      customElement.innerHTML = code; // Assuming user enters valid HTML code
-      customElement.style.position = 'absolute';
-      customElement.style.left = '250px';
-      customElement.style.top = '250px';
-      document.getElementById('canvas').appendChild(customElement);
-    }
+            // Clear the input field after sending
+            userInput.value = "";
+        }
 
-    // Handle Drag Start
-    function dragStart(e) {
-      draggedElement = e.target;
-      const rect = draggedElement.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const offsetY = e.clientY - rect.top;
+        // Customize AI responses by modifying the responses object
+        // Example: responses["hello"] = "Hello, how can I assist you today?";
+    </script>
 
-      document.onmousemove = function (e) {
-        draggedElement.style.left = `${e.clientX - offsetX}px`;
-        draggedElement.style.top = `${e.clientY - offsetY}px`;
-      };
-
-      document.onmouseup = function () {
-        document.onmousemove = null;
-        document.onmouseup = null;
-      };
-    }
-
-    // Enhance Project via Rainbow Effect and Input Box
-    function enhanceProject() {
-      const input = document.getElementById('enhanceInput').value;
-      alert('Project Enhanced: ' + input); // Simulate enhancement
-    }
-
-    // Exit Editor
-    function exitEditor() {
-      window.location.href = '/'; // or any exit logic
-    }
-
-    // Show Rainbow Border Effect on Page Load
-    window.onload = function() {
-      const rainbowEffect = document.getElementById('rainbowEffect');
-      setTimeout(() => {
-        rainbowEffect.style.display = 'block';
-        rainbowEffect.classList.add('active');
-      }, 1000); // delay showing rainbow effect
-    };
-  </script>
+    <!-- PWA Manifest (if added to home screen) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
+    </script>
 
 </body>
 </html>
