@@ -24,25 +24,121 @@
       text-align: center;
     }
 
-    /* Styling for the enhancement alert at the bottom */
+    /* Styling for the enhancement alert */
     .enhancement-alert {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
+      bottom: 20px;  /* More compact bottom spacing */
+      left: 50%;
+      transform: translateX(-50%);  /* Centers horizontally */
+      width: 90%;  /* Maximum width similar to a mobile screen */
+      max-width: 320px;  /* iPhone-like width */
       background-color: #1e1e1e; /* Dark background for alert */
-      padding: 20px;
+      padding: 15px;
       box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
-      border-radius: 10px 10px 0 0;
+      border-radius: 15px;  /* Rounded corners */
       text-align: center;
-      font-size: 18px;
+      font-size: 14px;
       display: none;
       animation: slideUp 0.5s ease-out;
       position: relative;
       z-index: 1; /* Ensures the content is on top */
     }
 
-    /* Slide up animation */
+    /* Slide-up animation */
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    /* Rainbow effect around the alert with smooth sliding */
+    .rainbow-border-wrapper {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 5px solid;
+      border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      border-image-slice: 1;
+      border-radius: 15px; /* Rounded corners */
+      animation: rainbowMovement 5s linear infinite;
+      z-index: -1; /* Behind the content */
+    }
+
+    /* Rainbow movement animation */
+    @keyframes rainbowMovement {
+      0% {
+        border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      }
+      50% {
+        border-image-source: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet);
+      }
+      100% {
+        border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      }
+    }
+
+    /* Sparkling effect */
+    @keyframes sparkleEffect {
+      0% {
+        box-shadow: 0 0 
+
+To make the enhancement alert fit like an Apple Pay notification at the bottom of the screen with the desired effect, we can modify the size of the alert and ensure that it behaves like a compact, mobile-style notification. This includes adjusting the height, width, and ensuring that it appears at the bottom with a smooth slide-up effect. Here is how you can implement it:
+
+### Updated Code for Compact, Bottom-Slide Alert (Apple Pay Style)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhancement Alert (Apple Pay Style)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212; /* Dark background */
+      color: #e0e0e0; /* Light text */
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    h1 {
+      color: #ffffff;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    /* Styling for the enhancement alert at the bottom */
+    .enhancement-alert {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 360px; /* Max width for iPhone-like size */
+      background-color: #1e1e1e; /* Dark background for alert */
+      padding: 15px 20px;
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      font-size: 14px;
+      display: none;
+      animation: slideUp 0.5s ease-out;
+      position: relative;
+      z-index: 1; /* Ensures the content is on top */
+    }
+
+    /* Slide-up animation */
     @keyframes slideUp {
       from {
         transform: translateY(100%);
@@ -94,10 +190,10 @@
     }
 
     .enhancement-input {
-      width: 80%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      margin-top: 10px;
       border-radius: 5px;
       border: 1px solid #444; /* Darker border */
       background-color: #2c2c2c; /* Dark input background */
@@ -113,13 +209,13 @@
     .enhance-btn {
       background-color: #007BFF;
       color: white;
-      padding: 12px 25px;
+      padding: 10px 20px;
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
       border: none;
       outline: none;
-      margin-top: 20px;
+      margin-top: 15px;
       transition: all 0.3s ease;
     }
 
@@ -128,8 +224,8 @@
     }
 
     .enhanced-output {
-      margin-top: 20px;
-      font-size: 18px;
+      margin-top: 10px;
+      font-size: 14px;
       font-weight: bold;
       color: #00ff00; /* Bright color for output */
     }
