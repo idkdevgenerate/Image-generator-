@@ -3,113 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Username Finder</title>
+    <title>Jumping Obstacle Game</title>
+    
+    <!-- Link to manifest for full-screen experience -->
+    <link rel="manifest" href="data:application/json;base64,eyJub...">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #f7f7f7;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #00b0ff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        #result {
-            margin-top: 20px;
-        }
-        .user-card {
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            margin-top: 10px;
+            height: 100%;
+            background-color: #87CEEB;
             display: flex;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
+            overflow: hidden;
         }
-        .user-card img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
-        .user-card a {
-            color: #00b0ff;
-            text-decoration: none;
+
+        #gameCanvas {
+            background-color: #f8f8f8;
+            border: 2px solid #000;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Roblox Username Finder</h1>
-    <input type="text" id="usernameInput" placeholder="Enter Roblox username" />
-    <button id="searchButton">Search</button>
-    <div id="result"></div>
-</div>
+<canvas id="gameCanvas" width="800" height="400"></canvas>
 
 <script>
-    document.getElementById('searchButton').addEventListener('click', async function() {
-        const username = document.getElementById('usernameInput').value.trim();
-        if (username === "") {
-            alert("Please enter a username");
-            return;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const GRAVITY = 0.8;
+    const JUMP_STRENGTH = -15;
+    const OBSTACLE_SPEED = 4;
+    const PLAYER_WIDTH = 30;
+    const PLAYER_HEIGHT = 50;
+    const OBSTACLE_WIDTH = 30;
+    const OBSTACLE_HEIGHT = 50;
+
+    let player = {
+        x: 50,
+        y: canvas.height - PLAYER_HEIGHT - 20,
+        width: PLAYER_WIDTH,
+        height: PLAYER_HEIGHT,
+        velocityY: 0,
+        jumping: false
+    };
+
+    let obstacles = [];
+    let score = 0;
+    let gameOver = false;
+
+    // Draw the player
+    function drawPlayer() {
+        ctx.fillStyle = "green";
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Draw obstacles
+    function drawObstacles() {
+        ctx.fillStyle = "red";
+        for (let i = 0; i < obstacles.length; i++) {
+            ctx.fillRect(obstacles[i].x, obstacles[i].y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
+        }
+    }
+
+    // Move player
+    function updatePlayer() {
+        if (player.jumping) {
+            player.velocityY += GRAVITY;
+            player.y += player.velocityY;
+
+            // Prevent falling through the ground
+            if (player.y > canvas.height - PLAYER_HEIGHT - 20) {
+                player.y = canvas.height - PLAYER_HEIGHT - 20;
+                player.velocityY = 0;
+                player.jumping = false;
+            }
+        }
+    }
+
+    // Jump the player
+    function jump() {
+        if (!player.jumping) {
+            player.velocityY = JUMP_STRENGTH;
+            player.jumping = true;
+        }
+    }
+
+    // Generate obstacles
+    function generateObstacle() {
+        const obstacle = {
+            x: canvas.width,
+            y: canvas.height - OBSTACLE_HEIGHT - 20
+        };
+        obstacles.push(obstacle);
+    }
+
+    // Move obstacles
+    function updateObstacles() {
+        for (let i = 0; i < obstacles.length; i++) {
+            obstacles[i].x -= OBSTACLE_SPEED;
+
+            // Remove obstacles that pass off the screen
+            if (obstacles[i].x + OBSTACLE_WIDTH < 0) {
+                obstacles.splice(i, 1);
+                score++;
+            }
+
+            // Check for collision with player
+            if (player.x < obstacles[i].x + OBSTACLE_WIDTH &&
+                player.x + player.width > obstacles[i].x &&
+                player.y < obstacles[i].y + OBSTACLE_HEIGHT &&
+                player.y + player.height > obstacles[i].y) {
+                gameOver = true;
+            }
+        }
+    }
+
+    // Update the game state
+    function update() {
+        if (gameOver) {
+            alert(`Game Over! Your score: ${score}`);
+            document.location.reload(); // Reload the game
         }
 
-        // Fetching user data based on username
-        const userUrl = `https://api.roblox.com/users/get-by-username?username=${username}`;
-        const response = await fetch(userUrl);
-        
-        if (!response.ok) {
-            document.getElementById('result').innerHTML = "<p>User not found or invalid username.</p>";
-            return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        updatePlayer();
+        updateObstacles();
+
+        drawPlayer();
+        drawObstacles();
+
+        requestAnimationFrame(update);
+    }
+
+    // Listen for key events
+    document.addEventListener("keydown", function(e) {
+        if (e.key === " " || e.key === "ArrowUp") {  // Space or up arrow to jump
+            jump();
         }
-
-        const userData = await response.json();
-        const userId = userData.Id;
-
-        // Fetching user avatar image
-        const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
-
-        // Fetching user status (Online or Offline)
-        const statusUrl = `https://users.roblox.com/v1/users/${userId}/status`;
-        const statusResponse = await fetch(statusUrl);
-        const statusData = await statusResponse.json();
-        const status = statusData.isOnline ? "Online" : "Offline";
-
-        // Displaying user info in a card
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `
-            <div class="user-card">
-                <div>
-                    <h3>${userData.Username}</h3>
-                    <p>Status: ${status}</p>
-                </div>
-                <img src="${avatarUrl}" alt="Avatar">
-                <a href="https://www.roblox.com/users/${userId}/profile" target="_blank">Go to Profile</a>
-            </div>
-        `;
     });
+
+    // Generate obstacles every 2 seconds
+    setInterval(generateObstacle, 2000);
+
+    // Start the game loop
+    update();
 </script>
 
 </body>
