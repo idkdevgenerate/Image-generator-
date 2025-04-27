@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enhancement Alert - Moving Rainbow Border</title>
+  <title>Enhancement Alert - Outside Rainbow Border</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,6 +38,8 @@
       font-size: 18px;
       display: none;
       animation: slideUp 0.5s ease-out;
+      position: relative;
+      z-index: 1; /* Ensures the content is on top */
     }
 
     /* Slide up animation */
@@ -50,14 +52,19 @@
       }
     }
 
-    /* Styling for the rainbow border and sparkling effect */
-    .rainbow-border {
-      border: 5px solid;
+    /* Styling for the rainbow border and sparkling effect (outside the content) */
+    .rainbow-border-wrapper {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border: 3px solid;
       border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
       border-image-slice: 1;
-      padding: 15px;
-      position: relative;
-      animation: rainbowMovement 5s infinite, sparkleEffect 2s infinite;
+      padding: 0;
+      z-index: -1; /* Behind the content */
+      animation: rainbowMovement 5s infinite;
     }
 
     /* Rainbow movement */
@@ -122,6 +129,8 @@
 
   <!-- Enhancement alert (bottom) -->
   <div class="enhancement-alert" id="enhancementAlert">
+    <div class="rainbow-border-wrapper"></div> <!-- Rainbow border outside -->
+
     <div class="rainbow-border">
       <h2 style="color: white;">Enhance Your Project!</h2>
       <p style="color: #bbb;">This is where the magic happens!</p>
