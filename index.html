@@ -3,220 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enhancement Alert (Apple Pay Style)</title>
+  <meta name="theme-color" content="#111">
+  <title>Geometry Dash Game</title>
 
-  <!-- Manifest JSON embedded within the HTML -->
-  <script type="application/manifest+json">
-  {
-    "name": "Enhancement Alert",
-    "short_name": "Enhance App",
-    "description": "An app to enhance your projects with a creative alert UI.",
-    "start_url": "./",
-    "display": "standalone",
-    "background_color": "#121212",
-    "theme_color": "#1e1e1e",
-    "icons": [
-      {
-        "src": "icons/icon-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "icons/icon-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
+  <!-- Manifest Inline -->
+  <script type="application/json" id="manifest">
+    {
+      "short_name": "Geometry Dash",
+      "name": "Geometry Dash-like Game",
+      "icons": [
+        {
+          "src": "icon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+      "start_url": "/index.html",
+      "background_color": "#111",
+      "theme_color": "#111",
+      "display": "standalone",
+      "orientation": "portrait"
+    }
   </script>
-
-  <!-- Apple-specific meta tags for PWA behavior -->
-  <meta name="apple-mobile-web-app-title" content="Enhancement Alert">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   
-  <!-- Icon for iOS Web App -->
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-  
-  <!-- Make sure it displays correctly on mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212; /* Dark background */
-      color: #e0e0e0; /* Light text */
       margin: 0;
       padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       overflow: hidden;
+      background-color: #111;
     }
-
-    h1 {
-      color: #ffffff;
-      margin-bottom: 30px;
-      text-align: center;
+    canvas {
+      display: block;
     }
-
-    /* Styling for the enhancement alert at the bottom */
-    .enhancement-alert {
+    #fullscreenButton {
       position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 360px; /* Max width for iPhone-like size */
-      background-color: #1e1e1e; /* Dark background for alert */
-      padding: 15px 20px;
-      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
-      border-radius: 10px 10px 0 0;
-      text-align: center;
-      font-size: 14px;
-      display: none;
-      animation: slideUp 0.5s ease-out;
-      position: relative;
-      z-index: 1; /* Ensures the content is on top */
-    }
-
-    /* Slide-up animation */
-    @keyframes slideUp {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
-    }
-
-    /* Rainbow effect around the alert with smooth sliding */
-    .rainbow-border-wrapper {
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
-      border: 5px solid;
-      border-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
-      border-image-slice: 1;
-      border-radius: 10px; /* Rounded corners */
-      animation: rainbowMovement 5s linear infinite;
-      z-index: -1; /* Behind the content */
-    }
-
-    /* Rainbow movement animation */
-    @keyframes rainbowMovement {
-      0% {
-        border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
-      }
-      50% {
-        border-image-source: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet);
-      }
-      100% {
-        border-image-source: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
-      }
-    }
-
-    /* Refined text box style */
-    .enhancement-input {
-      width: 100%;
-      padding: 12px 16px; /* Adjusted padding for a more comfortable size */
-      font-size: 16px; /* Larger, clearer font */
-      margin-top: 10px;
-      border-radius: 10px; /* Rounded corners */
-      border: 1px solid #444; /* Soft, dark border */
-      background-color: #2c2c2c; /* Slightly lighter background */
-      color: #e0e0e0;
-      outline: none;
-      transition: all 0.3s ease;
-      box-sizing: border-box; /* Makes sure padding does not affect width */
-    }
-
-    .enhancement-input:focus {
-      border: 1px solid #00ff00; /* Bright green border when focused */
-      box-shadow: 0 0 8px rgba(0, 255, 0, 0.5); /* Subtle glowing effect */
-    }
-
-    .enhance-btn {
-      background-color: #007BFF;
-      color: white;
+      top: 20px;
+      right: 20px;
+      background: #333;
+      color: #fff;
       padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
       border: none;
-      outline: none;
-      margin-top: 15px;
-      transition: all 0.3s ease;
-    }
-
-    .enhance-btn:hover {
-      background-color: #0056b3;
-    }
-
-    /* Close button (X) */
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 20px;
-      color: #e0e0e0;
       cursor: pointer;
-      background: none;
-      border: none;
     }
-
   </style>
 </head>
 <body>
+  <canvas id="gameCanvas"></canvas>
+  <button id="fullscreenButton">Go Full Screen</button>
 
-  <h1>Enhancement Alert</h1>
-
-  <div id="enhancement-alert" class="enhancement-alert">
-    <div class="rainbow-border-wrapper"></div>
-    <button class="close-btn" onclick="closeAlert()">X</button>
-    <h2>Enhance Your Project</h2>
-    <input type="text" id="enhancement-input" class="enhancement-input" placeholder="Enter enhancement...">
-    <button class="enhance-btn">Enhance Now</button>
-  </div>
-
+  <!-- Service Worker Registration Script -->
   <script>
-    const alertElement = document.getElementById('enhancement-alert');
-    let isAlertVisible = false;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+  </script>
 
-    // Function to show the enhancement alert
-    function showAlert() {
-      alertElement.style.display = 'block';
-      isAlertVisible = true;
+  <!-- Inline Game Script -->
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const fullscreenButton = document.getElementById('fullscreenButton');
+
+    // Set initial canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Load levels from JSON (inline)
+    const levelData = {
+      "levels": [
+        {
+          "id": 1,
+          "name": "Spike Gauntlet",
+          "description": "A series of narrow platforms with spikes scattered all around. Time your jumps precisely to avoid the spikes.",
+          "music": "spike-gauntlet.mp3",
+          "platforms": [
+            { "x": 0, "y": canvas.height - 50, "width": 500, "height": 50 },
+            { "x": 600, "y": canvas.height - 150, "width": 200, "height": 20 },
+            { "x": 900, "y": canvas.height - 250, "width": 200, "height": 20 }
+          ],
+          "spikes": [
+            { "x": 600, "y": canvas.height - 100, "width": 50, "height": 50 },
+            { "x": 900, "y": canvas.height - 180, "width": 50, "height": 50 },
+            { "x": 1200, "y": canvas.height - 280, "width": 50, "height": 50 }
+          ],
+          "background": "#111",
+          "levelColor": "#FF5733"
+        },
+        {
+          "id": 2,
+          "name": "Bouncing Madness",
+          "description": "A level filled with wall bouncing and tricky obstacles. You must bounce off walls to survive.",
+          "music": "bouncing-madness.mp3",
+          "platforms": [
+            { "x": 0, "y": canvas.height - 50, "width": 500, "height": 50 },
+            { "x": 400, "y": canvas.height - 150, "width": 200, "height": 20 }
+          ],
+          "spikes": [
+            { "x": 600, "y": canvas.height - 100, "width": 50, "height": 50 },
+            { "x": 1000, "y": canvas.height - 200, "width": 50, "height": 50 }
+          ],
+          "bouncingWalls": [
+            { "x": 700, "y": 300, "width": 50, "height": 100, "speed": 2 },
+            { "x": 1100, "y": 200, "width": 50, "height": 100, "speed": -2 }
+          ],
+          "background": "#222",
+          "levelColor": "#33FF57"
+        }
+      ]
+    };
+
+    // Function to load a level dynamically
+    function loadLevel(levelId) {
+      const level = levelData.levels.find(level => level.id === levelId);
+      if (!level) return;
+
+      // Set the background color
+      document.body.style.backgroundColor = level.background;
+
+      // Draw platforms
+      ctx.fillStyle = level.levelColor;
+      level.platforms.forEach(platform => {
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+      });
+
+      // Draw spikes
+      ctx.fillStyle = "red";
+      level.spikes.forEach(spike => {
+        ctx.fillRect(spike.x, spike.y, spike.width, spike.height);
+      });
+
+      // Draw bouncing walls
+      ctx.fillStyle = "blue";
+      level.bouncingWalls.forEach(wall => {
+        ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+      });
     }
 
-    // Function to close the enhancement alert
-    function closeAlert() {
-      alertElement.style.display = 'none';
-      isAlertVisible = false;
-    }
-
-    // Swipe gesture detection (simple)
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    alertElement.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].clientX;
-    });
-
-    alertElement.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].clientX;
-      if (touchEndX < touchStartX - 50) {
-        closeAlert();  // Close alert on swipe left
+    // Full-screen mode
+    fullscreenButton.addEventListener("click", function() {
+      if (canvas.requestFullscreen) {
+        canvas.requestFullscreen();
+      } else if (canvas.mozRequestFullScreen) { // Firefox
+        canvas.mozRequestFullScreen();
+      } else if (canvas.webkitRequestFullscreen) { // Chrome and Safari
+        canvas.webkitRequestFullscreen();
+      } else if (canvas.msRequestFullscreen) { // IE/Edge
+        canvas.msRequestFullscreen();
       }
     });
 
-    // Example to show alert after a delay
-    setTimeout(showAlert, 1000); // Show alert after 1 second
-
+    // Load level 1 as default
+    loadLevel(1);
   </script>
 </body>
 </html>
