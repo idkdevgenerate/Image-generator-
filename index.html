@@ -14,6 +14,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
+      background-color: #f4f4f4;
     }
     #toolbar {
       position: fixed;
@@ -61,6 +62,41 @@
       border-radius: 5px;
       position: absolute;
     }
+    /* Rainbow Border Effect */
+    .rainbow-border {
+      border-radius: 10px;
+      padding: 15px;
+      position: fixed;
+      left: 10%;
+      bottom: 10%;
+      width: 80%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 18px;
+      display: none;
+      text-align: center;
+    }
+
+    /* For the rainbow animation */
+    @keyframes rainbow {
+      0% { border-color: red; }
+      14% { border-color: orange; }
+      28% { border-color: yellow; }
+      42% { border-color: green; }
+      57% { border-color: blue; }
+      71% { border-color: indigo; }
+      85% { border-color: violet; }
+      100% { border-color: red; }
+    }
+
+    .rainbow-border.active {
+      animation: rainbow 1.5s linear infinite;
+    }
+
+    /* Blurred Background */
+    .blurred {
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
 <body>
@@ -83,6 +119,12 @@
     <textarea id="customCode" rows="5" cols="40" placeholder="Write your custom HTML/CSS/JS code here..."></textarea>
     <br>
     <button onclick="addCustomCode()">Add Custom Code</button>
+  </div>
+
+  <!-- Rainbow Border for Enhancement -->
+  <div id="rainbowEffect" class="rainbow-border blurred">
+    <input type="text" id="enhanceInput" placeholder="Enhance your project..." />
+    <button onclick="enhanceProject()">Enhance</button>
   </div>
 
   <script>
@@ -139,10 +181,25 @@
       };
     }
 
+    // Enhance Project via Rainbow Effect and Input Box
+    function enhanceProject() {
+      const input = document.getElementById('enhanceInput').value;
+      alert('Project Enhanced: ' + input); // Simulate enhancement
+    }
+
     // Exit Editor
     function exitEditor() {
       window.location.href = '/'; // or any exit logic
     }
+
+    // Show Rainbow Border Effect on Page Load
+    window.onload = function() {
+      const rainbowEffect = document.getElementById('rainbowEffect');
+      setTimeout(() => {
+        rainbowEffect.style.display = 'block';
+        rainbowEffect.classList.add('active');
+      }, 1000); // delay showing rainbow effect
+    };
   </script>
 
 </body>
