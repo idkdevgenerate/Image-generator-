@@ -67,56 +67,28 @@
       border: none;
     }
 
-    /* Button to toggle fullscreen */
-    #fullscreenBtn {
+    /* Panel that opens from the bottom */
+    #bottomPanel {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease;
-      z-index: 10;
-    }
-
-    #fullscreenBtn:hover {
-      background-color: #45a049;
-    }
-
-    #fullscreenBtn:active {
-      transform: scale(0.95);
-    }
-
-    /* Smooth exit panel */
-    #exitPanel {
-      position: fixed;
-      bottom: 30px;
-      right: 100px;
+      bottom: -100px; /* Start hidden below the screen */
+      left: 0;
+      width: 100%;
       background-color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 20px;
+      border-top: 3px solid #4CAF50;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      display: none;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease-in-out;
+      z-index: 100;
+      transition: bottom 0.3s ease;
     }
 
-    #exitPanel.active {
-      display: block;
-      opacity: 1;
-      pointer-events: all;
+    #bottomPanel.active {
+      bottom: 0; /* Move it up to the screen */
     }
 
-    #exitPanel button {
+    #bottomPanel button {
       background-color: #FF6347;
       color: white;
-      padding: 10px 15px;
+      padding: 10px 20px;
       font-size: 16px;
       border: none;
       border-radius: 5px;
@@ -124,33 +96,14 @@
       transition: background-color 0.3s ease;
     }
 
-    #exitPanel button:hover {
+    #bottomPanel button:hover {
       background-color: #e55344;
     }
 
-    /* Green Notification Bar */
-    #notificationBar {
-      position: absolute;
-      top: -50px;
-      left: 0;
-      width: 100%;
-      background-color: #4CAF50;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      font-size: 18px;
-      transition: top 0.3s ease;
-      z-index: 100;
-    }
-
-    #notificationBar.show {
-      top: 0;
-    }
-
-    /* Swipe-down gesture */
+    /* Swipe-up gesture area */
     #swipeArea {
       position: absolute;
-      top: 0;
+      bottom: 0;
       left: 0;
       width: 100%;
       height: 50px;
@@ -167,96 +120,37 @@
     <iframe id="appIframe" src="https://www.example.com"></iframe>
   </div>
 
-  <!-- Fullscreen toggle button -->
-  <button id="fullscreenBtn" onclick="toggleFullScreen()">Toggle Fullscreen</button>
-
-  <!-- Exit panel for URL bar -->
-  <div id="exitPanel">
-    <button onclick="exitFullScreen()">Exit Fullscreen</button>
-  </div>
-
-  <!-- Green notification bar -->
-  <div id="notificationBar">Swipe down to access the notification!</div>
-
-  <!-- Area to detect swipe-down gesture -->
+  <!-- Swipe-up gesture area -->
   <div id="swipeArea"></div>
 
+  <!-- Bottom panel -->
+  <div id="bottomPanel">
+    <button onclick="closePanel()">Close Panel</button>
+  </div>
+
   <script>
-    // Function to toggle fullscreen mode
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
-          document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
-          document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
-          document.documentElement.msRequestFullscreen();
-        }
-
-        // Show the exit panel once fullscreen is activated
-        document.getElementById('exitPanel').classList.add('active');
-        localStorage.setItem('isFullscreen', 'true');
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) { // Firefox
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) { // Chrome, Safari, Opera
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { // IE/Edge
-          document.msExitFullscreen();
-        }
-
-        // Hide the exit panel once fullscreen is exited
-        document.getElementById('exitPanel').classList.remove('active');
-        localStorage.setItem('isFullscreen', 'false');
-      }
-    }
-
-    // Function to exit fullscreen mode
-    function exitFullScreen() {
-      document.exitFullscreen();
-      document.getElementById('exitPanel').classList.remove('active');
-      localStorage.setItem('isFullscreen', 'false');
-    }
-
-    // Show notification bar when swiping down from the top
-    const swipeArea = document.getElementById('swipeArea');
-    const notificationBar = document.getElementById('notificationBar');
-
-    swipeArea.addEventListener('touchstart', handleSwipeDown);
-
+    // Variables to track swipe position
     let touchStartY = 0;
+    const swipeArea = document.getElementById('swipeArea');
+    const bottomPanel = document.getElementById('bottomPanel');
 
-    function handleSwipeDown(event) {
-      touchStartY = event.touches[0].clientY;
-    }
+    // Event listener for swipe-up gesture
+    swipeArea.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    });
 
-    swipeArea.addEventListener('touchmove', handleSwipeMove);
-
-    function handleSwipeMove(event) {
-      const touchEndY = event.touches[0].clientY;
-      if (touchEndY - touchStartY > 50) {
-        notificationBar.classList.add('show');
+    swipeArea.addEventListener('touchmove', (e) => {
+      const touchEndY = e.touches[0].clientY;
+      if (touchStartY - touchEndY > 50) { // Swipe-up detected
+        bottomPanel.classList.add('active'); // Open the panel
       }
+    });
+
+    // Close the panel
+    function closePanel() {
+      bottomPanel.classList.remove('active');
     }
-
-    swipeArea.addEventListener('touchend', handleSwipeEnd);
-
-    function handleSwipeEnd(event) {
-      setTimeout(() => {
-        notificationBar.classList.remove('show');
-      }, 2000); // Hide after 2 seconds
-    }
-
-    // Check if the app was previously in fullscreen when loaded
-    window.onload = function() {
-      if (localStorage.getItem('isFullscreen') === 'true') {
-        document.getElementById('exitPanel').classList.add('active');
-      }
-    };
   </script>
+
 </body>
 </html>
