@@ -1,117 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redsoft - Login with Roblox</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f3f3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Level Game</title>
+
+  <!-- Add to home screen Manifest in the <script> tag -->
+  <script type="application/manifest+json">
+    {
+      "name": "Dynamic Level Game",
+      "short_name": "Game",
+      "description": "A fun 3D grid-based level game",
+      "start_url": "./index.html",
+      "display": "standalone",
+      "background_color": "#000000",
+      "theme_color": "#000000",
+      "icons": [
+        {
+          "src": "icon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "src": "icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
         }
-        .login-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-        .logo {
-            width: 80px;
-            margin-bottom: 10px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #005a9e;
-        }
-        .forgot-password {
-            display: block;
-            margin-top: 10px;
-            color: #0078d4;
-            text-decoration: none;
-        }
-        .avatar {
-            margin-top: 15px;
-            width: 100px;
-            height: 100px;
-            display: none;
-            border-radius: 50%;
-        }
-    </style>
+      ]
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    #game {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      grid-template-rows: repeat(10, 50px);
+      gap: 2px;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #e0e0e0;
+    }
+    .wall {
+      background-color: #888;
+    }
+    .player {
+      background-color: #f00;
+    }
+    .goal {
+      background-color: #0f0;
+    }
+    .empty {
+      background-color: #fff;
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <img src="redsoft-logo.png" alt="Redsoft Logo" class="logo">
-        <h2>Sign in with Roblox</h2>
-        <form onsubmit="event.preventDefault(); loginWithRoblox();">
-            <input type="text" id="username" placeholder="Roblox Username" required>
-            <button type="submit">Login</button>
-        </form>
-        <img id="avatar" class="avatar" src="" alt="Roblox Headshot">
-    </div>
 
-    <script>
-        async function getUserId(username) {
-            let response = await fetch("https://users.roblox.com/v1/usernames/users", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
-            });
+<div id="game"></div>
 
-            let data = await response.json();
-            if (data.data.length > 0) {
-                return data.data[0].id; 
-            } else {
-                alert("User not found!");
-                return null;
-            }
+<script>
+  // Game Parameters
+  const gridSize = 10;  // Grid size (10x10)
+  let currentLevel = 0;
+
+  // Player starting position
+  let playerPosition = { x: 0, y: 0 };
+
+  // Level layout (represented by 2D array)
+  let level = generateLevel(gridSize);
+
+  const gameContainer = document.getElementById('game');
+
+  // Initialize the game
+  function initGame() {
+    renderLevel(level);
+    createPlayer(playerPosition);
+  }
+
+  // Generate the level with walls and goal
+  function generateLevel(size) {
+    let grid = [];
+    
+    // Generate an empty grid
+    for (let i = 0; i < size; i++) {
+      grid.push(new Array(size).fill('empty'));
+    }
+
+    // Add walls
+    for (let i = 0; i < size; i++) {
+      grid[i][Math.floor(Math.random() * size)] = 'wall';
+    }
+
+    // Place goal
+    grid[size - 1][size - 1] = 'goal';
+
+    return grid;
+  }
+
+  // Render the grid and its contents
+  function renderLevel(level) {
+    gameContainer.innerHTML = '';
+    level.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellElement = document.createElement('div');
+        cellElement.classList.add('cell', cell);
+        if (cell === 'wall') {
+          cellElement.classList.add('wall');
         }
-
-        async function getHeadshot(username) {
-            let userId = await getUserId(username);
-            if (!userId) return;
-
-            let response = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=420x420&format=Png&isCircular=false`);
-            let data = await response.json();
-
-            if (data.data.length > 0) {
-                document.getElementById("avatar").src = data.data[0].imageUrl;
-                document.getElementById("avatar").style.display = "block";
-            } else {
-                alert("Headshot not found!");
-            }
+        if (cell === 'goal') {
+          cellElement.classList.add('goal');
         }
-
-        function loginWithRoblox() {
-            let username = document.getElementById("username").value;
-            if (username.trim() === "") {
-                alert("Please enter a Roblox username!");
-                return;
-            }
-
-            getHeadshot(username);
+        if (cell === 'empty') {
+          cellElement.classList.add('empty');
         }
-    </script>
+        gameContainer.appendChild(cellElement);
+      });
+    });
+  }
+
+  // Create player in the grid
+  function createPlayer(position) {
+    const cellIndex = position.y * gridSize + position.x;
+    const playerCell = gameContainer.children[cellIndex];
+    playerCell.classList.add('player');
+  }
+
+  // Move player based on arrow key input
+  function movePlayer(direction) {
+    const newPosition = { ...playerPosition };
+    
+    if (direction === 'up' && newPosition.y > 0) newPosition.y--;
+    if (direction === 'down' && newPosition.y < gridSize - 1) newPosition.y++;
+    if (direction === 'left' && newPosition.x > 0) newPosition.x--;
+    if (direction === 'right' && newPosition.x < gridSize - 1) newPosition.x++;
+
+    // Check if new position is not a wall
+    if (level[newPosition.y][newPosition.x] !== 'wall') {
+      playerPosition = newPosition;
+      renderLevel(level);
+      createPlayer(playerPosition);
+
+      // Check if player reached the goal
+      if (playerPosition.x === gridSize - 1 && playerPosition.y === gridSize - 1) {
+        alert('Level Completed!');
+        nextLevel();
+      }
+    }
+  }
+
+  // Move to the next level
+  function nextLevel() {
+    currentLevel++;
+    level = generateLevel(gridSize);  // Generate new level
+    playerPosition = { x: 0, y: 0 };  // Reset player position
+    renderLevel(level);
+    createPlayer(playerPosition);
+  }
+
+  // Listen for keypresses
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowUp') {
+      movePlayer('up');
+    } else if (event.key === 'ArrowDown') {
+      movePlayer('down');
+    } else if (event.key === 'ArrowLeft') {
+      movePlayer('left');
+    } else if (event.key === 'ArrowRight') {
+      movePlayer('right');
+    }
+  });
+
+  // Start the game
+  initGame();
+
+  // Full-Screen Mode Trigger on Add to Home Screen
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Automatically trigger fullscreen on app launch
+    document.documentElement.requestFullscreen();
+  }
+</script>
+
 </body>
 </html>
