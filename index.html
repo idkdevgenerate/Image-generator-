@@ -3,192 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Level Game</title>
-
-  <!-- Add to home screen Manifest in the <script> tag -->
-  <script type="application/manifest+json">
-    {
-      "name": "Dynamic Level Game",
-      "short_name": "Game",
-      "description": "A fun 3D grid-based level game",
-      "start_url": "./index.html",
-      "display": "standalone",
-      "background_color": "#000000",
-      "theme_color": "#000000",
-      "icons": [
-        {
-          "src": "icon.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        },
-        {
-          "src": "icon.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ]
-    }
-  </script>
+  <title>Navigation with Bottom Panel</title>
 
   <style>
     body {
-      margin: 0;
-      overflow: hidden;
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
     }
-    #game {
-      display: grid;
-      grid-template-columns: repeat(10, 50px);
-      grid-template-rows: repeat(10, 50px);
-      gap: 2px;
-      justify-content: center;
-      margin-top: 50px;
+
+    /* Navigation Bar */
+    #navbar {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      text-align: center;
+      cursor: pointer;
     }
-    .cell {
-      width: 50px;
-      height: 50px;
+
+    #navbar:hover {
+      background-color: #45a049;
+    }
+
+    /* Main content container */
+    #content {
+      flex-grow: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #e0e0e0;
-    }
-    .wall {
-      background-color: #888;
-    }
-    .player {
-      background-color: #f00;
-    }
-    .goal {
-      background-color: #0f0;
-    }
-    .empty {
       background-color: #fff;
     }
+
+    /* Sliding Panel Styles */
+    .swipe-panel {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      background-color: white;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: bottom 0.3s ease;
+      z-index: 9999;
+      text-align: center;
+    }
+
+    .swipe-panel.show {
+      bottom: 0;
+    }
+
+    /* URL input and buttons inside the panel */
+    .swipe-panel input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .swipe-panel button {
+      width: 80%;
+      padding: 12px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .swipe-panel button:disabled {
+      background-color: #ccc;
+    }
+
+    /* Exit Button */
+    .exit-btn {
+      background-color: red;
+      color: white;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
   </style>
 </head>
 <body>
 
-<div id="game"></div>
+<!-- Navigation Bar -->
+<div id="navbar" onclick="showPanel()">Open URL Input Panel</div>
+
+<!-- Main Content Area -->
+<div id="content">
+  <h2>Welcome to the Web App</h2>
+</div>
+
+<!-- Swipe-Up Panel for URL Input -->
+<div class="swipe-panel" id="swipePanel">
+  <h3>Edit URL</h3>
+  <input type="text" id="urlInputPanel" placeholder="Enter the URL here" />
+  <button onclick="updateURL()">OK</button>
+  <button class="exit-btn" onclick="closePanel()">Exit</button>
+</div>
 
 <script>
-  // Game Parameters
-  const gridSize = 10;  // Grid size (10x10)
-  let currentLevel = 0;
-
-  // Player starting position
-  let playerPosition = { x: 0, y: 0 };
-
-  // Level layout (represented by 2D array)
-  let level = generateLevel(gridSize);
-
-  const gameContainer = document.getElementById('game');
-
-  // Initialize the game
-  function initGame() {
-    renderLevel(level);
-    createPlayer(playerPosition);
+  // Function to show the panel
+  function showPanel() {
+    document.getElementById('swipePanel').classList.add('show');
   }
 
-  // Generate the level with walls and goal
-  function generateLevel(size) {
-    let grid = [];
-    
-    // Generate an empty grid
-    for (let i = 0; i < size; i++) {
-      grid.push(new Array(size).fill('empty'));
+  // Function to close the panel
+  function closePanel() {
+    document.getElementById('swipePanel').classList.remove('show');
+  }
+
+  // Function to update the URL in the iframe
+  function updateURL() {
+    const url = document.getElementById('urlInputPanel').value;
+    if (url) {
+      window.location.href = url;  // Or you can embed this in an iframe as per your need
+      closePanel();  // Close panel after URL is updated
+    } else {
+      alert('Please enter a valid URL');
     }
-
-    // Add walls
-    for (let i = 0; i < size; i++) {
-      grid[i][Math.floor(Math.random() * size)] = 'wall';
-    }
-
-    // Place goal
-    grid[size - 1][size - 1] = 'goal';
-
-    return grid;
-  }
-
-  // Render the grid and its contents
-  function renderLevel(level) {
-    gameContainer.innerHTML = '';
-    level.forEach((row, rowIndex) => {
-      row.forEach((cell, colIndex) => {
-        const cellElement = document.createElement('div');
-        cellElement.classList.add('cell', cell);
-        if (cell === 'wall') {
-          cellElement.classList.add('wall');
-        }
-        if (cell === 'goal') {
-          cellElement.classList.add('goal');
-        }
-        if (cell === 'empty') {
-          cellElement.classList.add('empty');
-        }
-        gameContainer.appendChild(cellElement);
-      });
-    });
-  }
-
-  // Create player in the grid
-  function createPlayer(position) {
-    const cellIndex = position.y * gridSize + position.x;
-    const playerCell = gameContainer.children[cellIndex];
-    playerCell.classList.add('player');
-  }
-
-  // Move player based on arrow key input
-  function movePlayer(direction) {
-    const newPosition = { ...playerPosition };
-    
-    if (direction === 'up' && newPosition.y > 0) newPosition.y--;
-    if (direction === 'down' && newPosition.y < gridSize - 1) newPosition.y++;
-    if (direction === 'left' && newPosition.x > 0) newPosition.x--;
-    if (direction === 'right' && newPosition.x < gridSize - 1) newPosition.x++;
-
-    // Check if new position is not a wall
-    if (level[newPosition.y][newPosition.x] !== 'wall') {
-      playerPosition = newPosition;
-      renderLevel(level);
-      createPlayer(playerPosition);
-
-      // Check if player reached the goal
-      if (playerPosition.x === gridSize - 1 && playerPosition.y === gridSize - 1) {
-        alert('Level Completed!');
-        nextLevel();
-      }
-    }
-  }
-
-  // Move to the next level
-  function nextLevel() {
-    currentLevel++;
-    level = generateLevel(gridSize);  // Generate new level
-    playerPosition = { x: 0, y: 0 };  // Reset player position
-    renderLevel(level);
-    createPlayer(playerPosition);
-  }
-
-  // Listen for keypresses
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowUp') {
-      movePlayer('up');
-    } else if (event.key === 'ArrowDown') {
-      movePlayer('down');
-    } else if (event.key === 'ArrowLeft') {
-      movePlayer('left');
-    } else if (event.key === 'ArrowRight') {
-      movePlayer('right');
-    }
-  });
-
-  // Start the game
-  initGame();
-
-  // Full-Screen Mode Trigger on Add to Home Screen
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    // Automatically trigger fullscreen on app launch
-    document.documentElement.requestFullscreen();
   }
 </script>
 
