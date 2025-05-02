@@ -1,165 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Authentication</title>
+  <title>Pop-up Example with Authentication</title>
   <style>
-    /* General Modal Style */
-    #modal {
+    /* Styling for the pop-up */
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid black;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    /* Styling for the background overlay */
+    #overlay {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(255, 0, 0, 0.8); /* Red overlay to indicate urgency */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      pointer-events: auto;
-    }
-    .modal-content {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      width: 500px;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-      color: #ff0000;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
     }
 
-    /* Urgent Message */
-    #authAnimation { display: none; }
-    #checkmark, #failmark { display: none; }
-    #status {
-      font-size: 18px;
-      font-weight: bold;
-      color: #ff0000;
+    /* Styling for the button */
+    #continueBtn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
-    button { 
-      padding: 15px 25px; 
-      background-color: #ff0000; 
-      color: white; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      font-size: 16px;
-      margin: 15px;
-    }
-    button:hover { 
-      background-color: #d10000; 
+    #continueBtn:hover {
+      background-color: #45a049;
     }
 
-    /* Disable close until finished */
-    #closeButton { display: none; }
+    /* Styling for the close button inside the pop-up */
+    #closeBtn {
+      padding: 10px 15px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #closeBtn:hover {
+      background-color: #e53935;
+    }
+
+    /* Styling for the authentication status */
+    #authStatus {
+      margin-top: 10px;
+    }
+
+    /* Success and Failure messages */
+    .success {
+      color: green;
+    }
+
+    .failure {
+      color: red;
+    }
   </style>
 </head>
 <body>
 
-<!-- Modal for Email Authentication -->
-<div id="modal">
-  <div class="modal-content">
-    <h2>Important Information</h2>
-    <p>We have found out you were trying to send an email to the developer.</p>
-    <p>Please follow the authentication process to complete the request.</p>
-    <button onclick="showConfirm()">Proceed</button>
+  <!-- Main button that triggers the pop-up -->
+  <button id="continueBtn" onclick="showPopup()">Continue with Email Dev</button>
+
+  <!-- Overlay background -->
+  <div id="overlay"></div>
+
+  <!-- Pop-up content -->
+  <div id="popup">
+    <h2>Authentication in Progress</h2>
+    <p id="authMessage">Please wait while we authenticate with the email dev account.</p>
+    <div id="authStatus"></div>
+    <button id="closeBtn" onclick="closePopup()">Close</button>
   </div>
-</div>
 
-<!-- Authentication Animation and Status -->
-<div id="authAnimation">
-  <div id="status">Authenticating...</div>
-  <p>Please do not close the page until authentication is complete.</p>
-</div>
+  <script>
+    // Function to show the pop-up and overlay
+    function showPopup() {
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
 
-<!-- Success/Failure Indicators -->
-<div id="checkmark">
-  <svg> <!-- Success Checkmark Animation --> </svg>
-  <p>Authentication successful!</p>
-</div>
-
-<div id="failmark">
-  <svg> <!-- Failure Animation --> </svg>
-  <p id="errorMessage">Authentication failed.</p>
-  <p>Sorry for the inconvenience, we are now reporting this error to our team.</p>
-  <button onclick="retryAuthentication()">Retry</button>
-</div>
-
-<!-- Close Button -->
-<button id="closeButton" onclick="closeModal()">Close</button>
-
-<script>
-// Step 1: Show confirmation and initiate authentication process
-function showConfirm() {
-  document.getElementById("modal").style.display = "none"; // Hide the initial modal
-  document.getElementById("authAnimation").style.display = "block"; // Show authentication animation
-  disableClose(); // Disable close button until process is finished
-  authenticateEmail(); // Start email authentication process
-}
-
-// Step 2: Authenticate the email request (simulate with a mock check)
-function authenticateEmail() {
-  // Show authenticating message
-  document.getElementById("status").innerText = "Authenticating with email server...";
-
-  // Simulate a mock email authentication
-  setTimeout(() => {
-    const success = Math.random() > 0.5; // Random success or failure for demo
-    if (success) {
-      showSuccess();
-    } else {
-      showFailure("Authentication failed. Please try again.");
+      // Start the authentication process
+      startAuthentication();
     }
-  }, 5000); // Simulate a 5-second authentication process
-}
 
-// Show success checkmark and close modal
-function showSuccess() {
-  document.getElementById("checkmark").style.display = "block";
-  document.getElementById("status").innerText = "Authentication successful!";
-  setTimeout(() => {
-    closeModal(); // Close the modal automatically after success
-  }, 2000); // Wait 2 seconds before closing the modal
-}
+    // Function to close the pop-up and overlay
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
 
-// Show failure animation and error message
-function showFailure(message) {
-  document.getElementById("failmark").style.display = "block";
-  document.getElementById("status").innerText = message;
-  document.getElementById("errorMessage").innerText = message;
-  enableClose(); // Enable close button after failure
-}
+    // Simulate the authentication process
+    function startAuthentication() {
+      document.getElementById("authMessage").innerText = "Authenticating... Please wait.";
 
-// Retry authentication process
-function retryAuthentication() {
-  document.getElementById("failmark").style.display = "none"; // Hide failure indicator
-  document.getElementById("authAnimation").style.display = "block"; // Show auth animation again
-  authenticateEmail(); // Retry the authentication process
-}
-
-// Disable the close button during authentication
-function disableClose() {
-  document.getElementById("closeButton").style.display = "none";
-  window.onbeforeunload = function() {
-    return "You can't close this until the authentication process is finished.";
-  };
-}
-
-// Enable the close button after process is complete
-function enableClose() {
-  document.getElementById("closeButton").style.display = "block";
-  window.onbeforeunload = null; // Allow closing the window after process finishes
-}
-
-// Close the modal
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  window.onbeforeunload = null; // Allow closing the window after modal closes
-}
-</script>
+      // Simulate a delay for the authentication process (e.g., 5 seconds)
+      setTimeout(function() {
+        let authSuccess = Math.random() > 0.5; // Randomly decide success or failure (50% chance)
+        
+        if (authSuccess) {
+          document.getElementById("authStatus").innerHTML = "<p class='success'>Authentication Successful! You may now proceed.</p>";
+          setTimeout(closePopup, 2000); // Close pop-up after 2 seconds
+        } else {
+          document.getElementById("authStatus").innerHTML = "<p class='failure'>Authentication Failed. Please try again.</p>";
+        }
+      }, 5000); // 5 seconds delay for simulating the authentication process
+    }
+  </script>
 
 </body>
 </html>
