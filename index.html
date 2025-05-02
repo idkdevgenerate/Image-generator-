@@ -3,154 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4CAF50">
-  <title>Full-Screen Home App</title>
-
-  <!-- Manifest for adding the app to the home screen -->
-  <link rel="manifest" href="data:application/json,{"name":"Full-Screen Home App","short_name":"HomeApp","description":"A full-screen home app with a rainbow border","start_url":"./index.html","display":"standalone","background_color":"#f0f0f0","theme_color":"#4CAF50","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"}]}">
-
+  <title>Email Authentication</title>
   <style>
-    /* General body and layout */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      height: 100vh;
-      background-color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      transition: background-color 0.3s ease;
-    }
-
-    /* Rainbow outline animation */
-    body::before {
-      content: '';
-      position: absolute;
+    /* General Modal Style */
+    #modal {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      border: 10px solid transparent;
-      background-image: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
-      background-size: 400% 400%;
-      animation: rainbow 5s ease infinite;
-      z-index: 0;
-    }
-
-    @keyframes rainbow {
-      0% { background-position: 0% 0%; }
-      50% { background-position: 100% 100%; }
-      100% { background-position: 0% 0%; }
-    }
-
-    /* Fullscreen iframe container */
-    #content {
-      width: 100%;
-      height: 100%;
-      background-color: #fff;
+      background: rgba(255, 0, 0, 0.8); /* Red overlay to indicate urgency */
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      z-index: 1;
+      z-index: 9999;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 500px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      color: #ff0000;
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border-radius: 10px;
-      border: none;
+    /* Urgent Message */
+    #authAnimation { display: none; }
+    #checkmark, #failmark { display: none; }
+    #status {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff0000;
     }
 
-    /* Panel that opens from the bottom */
-    #bottomPanel {
-      position: fixed;
-      bottom: -100px; /* Start hidden below the screen */
-      left: 0;
-      width: 100%;
-      background-color: #fff;
-      padding: 20px;
-      border-top: 3px solid #4CAF50;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-      transition: bottom 0.3s ease;
-    }
-
-    #bottomPanel.active {
-      bottom: 0; /* Move it up to the screen */
-    }
-
-    #bottomPanel button {
-      background-color: #FF6347;
-      color: white;
-      padding: 10px 20px;
+    button { 
+      padding: 15px 25px; 
+      background-color: #ff0000; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
       font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+      margin: 15px;
+    }
+    button:hover { 
+      background-color: #d10000; 
     }
 
-    #bottomPanel button:hover {
-      background-color: #e55344;
-    }
-
-    /* Swipe-up gesture area */
-    #swipeArea {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 50px;
-      background-color: transparent;
-      cursor: pointer;
-    }
-
+    /* Disable close until finished */
+    #closeButton { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Main iframe content -->
-  <div id="content">
-    <iframe id="appIframe" src="https://www.example.com"></iframe>
+<!-- Modal for Email Authentication -->
+<div id="modal">
+  <div class="modal-content">
+    <h2>Important Information</h2>
+    <p>We have found out you were trying to send an email to the developer.</p>
+    <p>Please follow the authentication process to complete the request.</p>
+    <button onclick="showConfirm()">Proceed</button>
   </div>
+</div>
 
-  <!-- Swipe-up gesture area -->
-  <div id="swipeArea"></div>
+<!-- Authentication Animation and Status -->
+<div id="authAnimation">
+  <div id="status">Authenticating...</div>
+  <p>Please do not close the page until authentication is complete.</p>
+</div>
 
-  <!-- Bottom panel -->
-  <div id="bottomPanel">
-    <button onclick="closePanel()">Close Panel</button>
-  </div>
+<!-- Success/Failure Indicators -->
+<div id="checkmark">
+  <svg> <!-- Success Checkmark Animation --> </svg>
+  <p>Authentication successful!</p>
+</div>
 
-  <script>
-    // Variables to track swipe position
-    let touchStartY = 0;
-    const swipeArea = document.getElementById('swipeArea');
-    const bottomPanel = document.getElementById('bottomPanel');
+<div id="failmark">
+  <svg> <!-- Failure Animation --> </svg>
+  <p id="errorMessage">Authentication failed.</p>
+  <p>Sorry for the inconvenience, we are now reporting this error to our team.</p>
+  <button onclick="retryAuthentication()">Retry</button>
+</div>
 
-    // Event listener for swipe-up gesture
-    swipeArea.addEventListener('touchstart', (e) => {
-      touchStartY = e.touches[0].clientY;
-    });
+<!-- Close Button -->
+<button id="closeButton" onclick="closeModal()">Close</button>
 
-    swipeArea.addEventListener('touchmove', (e) => {
-      const touchEndY = e.touches[0].clientY;
-      if (touchStartY - touchEndY > 50) { // Swipe-up detected
-        bottomPanel.classList.add('active'); // Open the panel
-      }
-    });
+<script>
+// Step 1: Show confirmation and initiate authentication process
+function showConfirm() {
+  document.getElementById("modal").style.display = "none"; // Hide the initial modal
+  document.getElementById("authAnimation").style.display = "block"; // Show authentication animation
+  disableClose(); // Disable close button until process is finished
+  authenticateEmail(); // Start email authentication process
+}
 
-    // Close the panel
-    function closePanel() {
-      bottomPanel.classList.remove('active');
+// Step 2: Authenticate the email request (simulate with a mock check)
+function authenticateEmail() {
+  // Show authenticating message
+  document.getElementById("status").innerText = "Authenticating with email server...";
+
+  // Simulate a mock email authentication
+  setTimeout(() => {
+    const success = Math.random() > 0.5; // Random success or failure for demo
+    if (success) {
+      showSuccess();
+    } else {
+      showFailure("Authentication failed. Please try again.");
     }
-  </script>
+  }, 5000); // Simulate a 5-second authentication process
+}
+
+// Show success checkmark and close modal
+function showSuccess() {
+  document.getElementById("checkmark").style.display = "block";
+  document.getElementById("status").innerText = "Authentication successful!";
+  setTimeout(() => {
+    closeModal(); // Close the modal automatically after success
+  }, 2000); // Wait 2 seconds before closing the modal
+}
+
+// Show failure animation and error message
+function showFailure(message) {
+  document.getElementById("failmark").style.display = "block";
+  document.getElementById("status").innerText = message;
+  document.getElementById("errorMessage").innerText = message;
+  enableClose(); // Enable close button after failure
+}
+
+// Retry authentication process
+function retryAuthentication() {
+  document.getElementById("failmark").style.display = "none"; // Hide failure indicator
+  document.getElementById("authAnimation").style.display = "block"; // Show auth animation again
+  authenticateEmail(); // Retry the authentication process
+}
+
+// Disable the close button during authentication
+function disableClose() {
+  document.getElementById("closeButton").style.display = "none";
+  window.onbeforeunload = function() {
+    return "You can't close this until the authentication process is finished.";
+  };
+}
+
+// Enable the close button after process is complete
+function enableClose() {
+  document.getElementById("closeButton").style.display = "block";
+  window.onbeforeunload = null; // Allow closing the window after process finishes
+}
+
+// Close the modal
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+  window.onbeforeunload = null; // Allow closing the window after modal closes
+}
+</script>
 
 </body>
 </html>
